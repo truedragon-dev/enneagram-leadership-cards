@@ -721,26 +721,25 @@ function resetInactivityTimer() {
 document.addEventListener('click', resetInactivityTimer);
 document.addEventListener('keypress', resetInactivityTimer);
 
-// Card click tracking - CUSTOMIZE THESE SELECTORS TO MATCH YOUR HTML
+// Card click tracking 
 document.addEventListener('click', function(e) {
-  const card = e.target.closest('.card'); // CHANGE '.card' to match your card class
+  const card = e.target.closest('.card');
   
   if (card) {
-    // Extract enneagram type - CUSTOMIZE THIS TO MATCH YOUR HTML
-    const enneagramType = card.getAttribute('data-type') || 
-                         card.className.match(/type-(\d+)/)?.[1] || 
-                         card.id?.replace('type-', '') ||
-                         'unknown';
+    // Extract enneagram type from your class names (type-1, type-2, etc.)
+    const typeMatch = card.className.match(/type-(\d+)/);
+    const enneagramType = typeMatch ? typeMatch[1] : 'experiment';
     
-    // Determine which side is showing - CUSTOMIZE THIS TO MATCH YOUR HTML
-    const isShowingTeam = card.classList.contains('flipped') || 
-                         card.classList.contains('team-side') ||
-                         card.classList.contains('showing-team');
-    const currentSide = isShowingTeam ? 'team' : 'individual';
-    
-    // Track the interaction
-    trackCardFlip(enneagramType, currentSide);
-    resetInactivityTimer();
+    // Determine which side is showing AFTER the flip
+    // We need to check AFTER the flip happens, so use a small delay
+    setTimeout(() => {
+      const isShowingTeam = card.classList.contains('flipped');
+      const currentSide = isShowingTeam ? 'team' : 'individual';
+      
+      // Track the interaction
+      trackCardFlip(enneagramType, currentSide);
+      resetInactivityTimer();
+    }, 50); // Small delay to let the flip complete
   }
 });
 
