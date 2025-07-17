@@ -138,9 +138,9 @@
             margin-top: 30px;
         }
 
-        .card-container {
+         .card-container {
             perspective: 1000px;
-            height: 900px;
+            height: 950px;
         }
 
         .card {
@@ -167,6 +167,13 @@
             background: white;
             border-left: 6px solid;
             overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .card-back {
+            transform: rotateY(180deg);
+            background: linear-gradient(135deg, #f7fafc 0%, #edf2f7 100%);
         }
 
         .card-back {
@@ -229,14 +236,14 @@
             text-align: center;
         }
 
-        .attribution {
-            position: absolute;
-            bottom: 50px;
-            left: 25px;
+ .attribution {
+            margin-top: auto;
+            margin-bottom: 40px;
             font-size: 0.75em;
             color: #9ca3af;
             font-style: italic;
         }
+
 
         .flip-indicator {
             position: absolute;
@@ -395,7 +402,7 @@
         .type-8 .field-question { border-left-color: #a63446; }
         .type-9 .field-question { border-left-color: #b8956a; }
 
-        @media (max-width: 768px) {
+         @media (max-width: 768px) {
             .container {
                 padding: 20px;
             }
@@ -409,7 +416,7 @@
             }
             
             .card-container {
-                height: 800px;
+                height: 850px;
             }
         }
     </style>
