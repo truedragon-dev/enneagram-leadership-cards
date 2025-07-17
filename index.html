@@ -2,14 +2,14 @@
 <html lang="en">
 <head>
     <!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-5VFNX8QJB3"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-5VFNX8QJB3"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-5VFNX8QJB3');
+    </script>
 
-  gtag('config', 'G-5VFNX8QJB3');
-</script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Enneagram Leadership Cards</title>
@@ -641,113 +641,211 @@
             grid.innerHTML = typeCards + experimentCard;
         }
 
-        // Initialize
+        // Initialize cards
         renderCards();
+
+        // Complete Enneagram Card Analytics Tracking
+        let cardSession = {
+          startTime: Date.now(),
+          totalFlips: 0,
+          individualViews: 0,
+          teamViews: 0,
+          typesViewed: new Set(),
+          lastFlipTime: Date.now()
+        };
+
+        let viewedCards = new Set();
+        let cardEngagementTimes = new Map();
+        let currentlyViewedCards = new Map();
+        let viewObserver;
+
+        function trackCardFlip(enneagramType, newSide) {
+          cardSession.totalFlips++;
+          cardSession.typesViewed.add(enneagramType);
+          cardSession.lastFlipTime = Date.now();
+          
+          if (newSide === 'individual') {
+            cardSession.individualViews++;
+          } else if (newSide === 'team') {
+            cardSession.teamViews++;
+          }
+          
+          gtag('event', 'card_flip', {
+            'event_category': 'card_interaction',
+            'event_label': `type_${enneagramType}_to_${newSide}`,
+            'enneagram_type': enneagramType,
+            'side_shown': newSide,
+            'total_flips': cardSession.totalFlips,
+            'session_duration': Math.round((Date.now() - cardSession.startTime) / 1000)
+          });
+          
+          gtag('event', `type_${enneagramType}_flip_to_${newSide}`, {
+            'event_category': 'specific_flips',
+            'enneagram_type': enneagramType,
+            'side_shown': newSide
+          });
+          
+          gtag('event', 'type_viewed', {
+            'event_category': 'card_interaction',
+            'event_label': `type_${enneagramType}`,
+            'custom_parameter_1': enneagramType,
+            'unique_types_in_session': cardSession.typesViewed.size
+          });
+          
+          gtag('event', `type_${enneagramType}_viewed`, {
+            'event_category': 'type_popularity',
+            'enneagram_type': enneagramType,
+            'side_shown': newSide
+          });
+        }
+
+        function trackCardView(card) {
+          const typeMatch = card.className.match(/type-(\d+)/);
+          const enneagramType = typeMatch ? typeMatch[1] : 'experiment';
+          
+          currentlyViewedCards.set(enneagramType, Date.now());
+          
+          if (!viewedCards.has(enneagramType)) {
+            viewedCards.add(enneagramType);
+            
+            gtag('event', 'card_viewed', {
+              'event_category': 'card_exposure',
+              'event_label': `type_${enneagramType}_viewed`,
+              'enneagram_type': enneagramType,
+              'side_shown': 'individual',
+              'view_method': 'scroll'
+            });
+            
+            gtag('event', `type_${enneagramType}_viewed_scroll`, {
+              'event_category': 'card_exposure',
+              'enneagram_type': enneagramType
+            });
+          }
+        }
+
+        function trackCardExit(card) {
+          const typeMatch = card.className.match(/type-(\d+)/);
+          const enneagramType = typeMatch ? typeMatch[1] : 'experiment';
+          
+          if (currentlyViewedCards.has(enneagramType)) {
+            const startTime = currentlyViewedCards.get(enneagramType);
+            const timeSpent = Math.round((Date.now() - startTime) / 1000);
+            
+            if (timeSpent >= 2) {
+              const existingTime = cardEngagementTimes.get(enneagramType) || 0;
+              cardEngagementTimes.set(enneagramType, existingTime + timeSpent);
+              
+              gtag('event', 'card_engagement_time', {
+                'event_category': 'card_engagement',
+                'event_label': `type_${enneagramType}_${timeSpent}s`,
+                'enneagram_type': enneagramType,
+                'engagement_seconds': timeSpent,
+                'total_card_time': cardEngagementTimes.get(enneagramType)
+              });
+              
+              let timeBucket;
+              if (timeSpent < 10) timeBucket = 'quick_scan';
+              else if (timeSpent < 30) timeBucket = 'moderate_read';
+              else if (timeSpent < 60) timeBucket = 'deep_read';
+              else timeBucket = 'extended_study';
+              
+              gtag('event', `type_${enneagramType}_${timeBucket}`, {
+                'event_category': 'engagement_depth',
+                'engagement_seconds': timeSpent,
+                'time_bucket': timeBucket
+              });
+            }
+            
+            currentlyViewedCards.delete(enneagramType);
+          }
+        }
+
+        function trackSessionSummary() {
+          const sessionDuration = Math.round((cardSession.lastFlipTime - cardSession.startTime) / 1000);
+          const preferredSide = cardSession.individualViews > cardSession.teamViews ? 'individual' : 'team';
+          
+          gtag('event', 'session_summary', {
+            'session_duration': sessionDuration,
+            'total_flips': cardSession.totalFlips,
+            'unique_types': cardSession.typesViewed.size,
+            'preferred_side': preferredSide,
+            'individual_views': cardSession.individualViews,
+            'team_views': cardSession.teamViews
+          });
+        }
+
+        function setupViewTracking() {
+          if ('IntersectionObserver' in window) {
+            viewObserver = new IntersectionObserver((entries) => {
+              entries.forEach(entry => {
+                if (entry.isIntersecting && entry.intersectionRatio > 0.5) {
+                  trackCardView(entry.target);
+                } else if (!entry.isIntersecting && currentlyViewedCards.has(entry.target.className.match(/type-(\d+)/)?.[1] || 'experiment')) {
+                  trackCardExit(entry.target);
+                }
+              });
+            }, {
+              threshold: [0, 0.5]
+            });
+            
+            document.querySelectorAll('.card').forEach(card => {
+              viewObserver.observe(card);
+            });
+          }
+        }
+
+        window.addEventListener('beforeunload', function() {
+          currentlyViewedCards.forEach((startTime, enneagramType) => {
+            const timeSpent = Math.round((Date.now() - startTime) / 1000);
+            if (timeSpent >= 2) {
+              const existingTime = cardEngagementTimes.get(enneagramType) || 0;
+              cardEngagementTimes.set(enneagramType, existingTime + timeSpent);
+              
+              gtag('event', 'final_card_engagement', {
+                'event_category': 'session_end',
+                'enneagram_type': enneagramType,
+                'engagement_seconds': timeSpent,
+                'total_card_time': cardEngagementTimes.get(enneagramType)
+              });
+            }
+          });
+          
+          trackSessionSummary();
+        });
+
+        let inactivityTimer;
+        function resetInactivityTimer() {
+          clearTimeout(inactivityTimer);
+          inactivityTimer = setTimeout(trackSessionSummary, 30000);
+        }
+
+        document.addEventListener('click', resetInactivityTimer);
+        document.addEventListener('keypress', resetInactivityTimer);
+
+        document.addEventListener('click', function(e) {
+          const card = e.target.closest('.card');
+          
+          if (card) {
+            const typeMatch = card.className.match(/type-(\d+)/);
+            const enneagramType = typeMatch ? typeMatch[1] : 'experiment';
+            
+            setTimeout(() => {
+              const isShowingTeam = card.classList.contains('flipped');
+              const currentSide = isShowingTeam ? 'team' : 'individual';
+              
+              trackCardFlip(enneagramType, currentSide);
+              resetInactivityTimer();
+            }, 50);
+          }
+        });
+
+        gtag('event', 'page_load', {
+          'page_title': document.title,
+          'page_location': window.location.href
+        });
+
+        // Initialize view tracking after cards are rendered
+        setTimeout(setupViewTracking, 1000);
     </script>
-    <!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-5VFNX8QJB3"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-  gtag('config', 'G-5VFNX8QJB3');
-</script>
-
-<!-- Enneagram Card Tracking -->
-<script>
-// Session tracking variables
-let cardSession = {
-  startTime: Date.now(),
-  totalFlips: 0,
-  individualViews: 0,
-  teamViews: 0,
-  typesViewed: new Set(),
-  lastFlipTime: Date.now()
-};
-
-// Track when a card is flipped
-function trackCardFlip(enneagramType, newSide) {
-  cardSession.totalFlips++;
-  cardSession.typesViewed.add(enneagramType);
-  cardSession.lastFlipTime = Date.now();
-  
-  // Count side preferences
-  if (newSide === 'individual') {
-    cardSession.individualViews++;
-  } else if (newSide === 'team') {
-    cardSession.teamViews++;
-  }
-  
-  // Send to Google Analytics
-  gtag('event', 'card_flip', {
-    'enneagram_type': enneagramType,
-    'side_shown': newSide,
-    'total_flips': cardSession.totalFlips,
-    'session_duration': Math.round((Date.now() - cardSession.startTime) / 1000)
-  });
-  
-  // Track type popularity
-  gtag('event', 'type_viewed', {
-    'enneagram_type': enneagramType,
-    'unique_types_viewed': cardSession.typesViewed.size
-  });
-}
-
-// Track session summary when user becomes inactive or leaves
-function trackSessionSummary() {
-  const sessionDuration = Math.round((cardSession.lastFlipTime - cardSession.startTime) / 1000);
-  const preferredSide = cardSession.individualViews > cardSession.teamViews ? 'individual' : 'team';
-  
-  gtag('event', 'session_summary', {
-    'session_duration': sessionDuration,
-    'total_flips': cardSession.totalFlips,
-    'unique_types': cardSession.typesViewed.size,
-    'preferred_side': preferredSide,
-    'individual_views': cardSession.individualViews,
-    'team_views': cardSession.teamViews
-  });
-}
-
-// Track session when user leaves
-window.addEventListener('beforeunload', trackSessionSummary);
-
-// Track session after 30 seconds of inactivity
-let inactivityTimer;
-function resetInactivityTimer() {
-  clearTimeout(inactivityTimer);
-  inactivityTimer = setTimeout(trackSessionSummary, 30000);
-}
-
-document.addEventListener('click', resetInactivityTimer);
-document.addEventListener('keypress', resetInactivityTimer);
-
-// Card click tracking 
-document.addEventListener('click', function(e) {
-  const card = e.target.closest('.card');
-  
-  if (card) {
-    // Extract enneagram type from your class names (type-1, type-2, etc.)
-    const typeMatch = card.className.match(/type-(\d+)/);
-    const enneagramType = typeMatch ? typeMatch[1] : 'experiment';
-    
-    // Determine which side is showing AFTER the flip
-    // We need to check AFTER the flip happens, so use a small delay
-    setTimeout(() => {
-      const isShowingTeam = card.classList.contains('flipped');
-      const currentSide = isShowingTeam ? 'team' : 'individual';
-      
-      // Track the interaction
-      trackCardFlip(enneagramType, currentSide);
-      resetInactivityTimer();
-    }, 50); // Small delay to let the flip complete
-  }
-});
-
-// Track initial page load
-gtag('event', 'page_load', {
-  'page_title': document.title,
-  'page_location': window.location.href
-});
-</script>
 </body>
 </html>
