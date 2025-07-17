@@ -1,6 +1,15 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-5VFNX8QJB3"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-5VFNX8QJB3');
+</script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Enneagram Leadership Cards</title>
@@ -635,5 +644,111 @@
         // Initialize
         renderCards();
     </script>
+    <!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-5VFNX8QJB3"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-5VFNX8QJB3');
+</script>
+
+<!-- Enneagram Card Tracking -->
+<script>
+// Session tracking variables
+let cardSession = {
+  startTime: Date.now(),
+  totalFlips: 0,
+  individualViews: 0,
+  teamViews: 0,
+  typesViewed: new Set(),
+  lastFlipTime: Date.now()
+};
+
+// Track when a card is flipped
+function trackCardFlip(enneagramType, newSide) {
+  cardSession.totalFlips++;
+  cardSession.typesViewed.add(enneagramType);
+  cardSession.lastFlipTime = Date.now();
+  
+  // Count side preferences
+  if (newSide === 'individual') {
+    cardSession.individualViews++;
+  } else if (newSide === 'team') {
+    cardSession.teamViews++;
+  }
+  
+  // Send to Google Analytics
+  gtag('event', 'card_flip', {
+    'enneagram_type': enneagramType,
+    'side_shown': newSide,
+    'total_flips': cardSession.totalFlips,
+    'session_duration': Math.round((Date.now() - cardSession.startTime) / 1000)
+  });
+  
+  // Track type popularity
+  gtag('event', 'type_viewed', {
+    'enneagram_type': enneagramType,
+    'unique_types_viewed': cardSession.typesViewed.size
+  });
+}
+
+// Track session summary when user becomes inactive or leaves
+function trackSessionSummary() {
+  const sessionDuration = Math.round((cardSession.lastFlipTime - cardSession.startTime) / 1000);
+  const preferredSide = cardSession.individualViews > cardSession.teamViews ? 'individual' : 'team';
+  
+  gtag('event', 'session_summary', {
+    'session_duration': sessionDuration,
+    'total_flips': cardSession.totalFlips,
+    'unique_types': cardSession.typesViewed.size,
+    'preferred_side': preferredSide,
+    'individual_views': cardSession.individualViews,
+    'team_views': cardSession.teamViews
+  });
+}
+
+// Track session when user leaves
+window.addEventListener('beforeunload', trackSessionSummary);
+
+// Track session after 30 seconds of inactivity
+let inactivityTimer;
+function resetInactivityTimer() {
+  clearTimeout(inactivityTimer);
+  inactivityTimer = setTimeout(trackSessionSummary, 30000);
+}
+
+document.addEventListener('click', resetInactivityTimer);
+document.addEventListener('keypress', resetInactivityTimer);
+
+// Card click tracking - CUSTOMIZE THESE SELECTORS TO MATCH YOUR HTML
+document.addEventListener('click', function(e) {
+  const card = e.target.closest('.card'); // CHANGE '.card' to match your card class
+  
+  if (card) {
+    // Extract enneagram type - CUSTOMIZE THIS TO MATCH YOUR HTML
+    const enneagramType = card.getAttribute('data-type') || 
+                         card.className.match(/type-(\d+)/)?.[1] || 
+                         card.id?.replace('type-', '') ||
+                         'unknown';
+    
+    // Determine which side is showing - CUSTOMIZE THIS TO MATCH YOUR HTML
+    const isShowingTeam = card.classList.contains('flipped') || 
+                         card.classList.contains('team-side') ||
+                         card.classList.contains('showing-team');
+    const currentSide = isShowingTeam ? 'team' : 'individual';
+    
+    // Track the interaction
+    trackCardFlip(enneagramType, currentSide);
+    resetInactivityTimer();
+  }
+});
+
+// Track initial page load
+gtag('event', 'page_load', {
+  'page_title': document.title,
+  'page_location': window.location.href
+});
+</script>
 </body>
 </html>
