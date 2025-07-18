@@ -213,7 +213,25 @@
             height: 950px;
             scroll-margin-top: 120px;
         }
+/* Focus highlight animation */
+.card-container.focused {
+    animation: cardFocus 1.2s ease-out;
+}
 
+@keyframes cardFocus {
+    0% {
+        transform: scale(1);
+        box-shadow: 0 0 0 0 rgba(102, 126, 234, 0);
+    }
+    40% {
+        transform: scale(1.01);
+        box-shadow: 0 0 0 15px rgba(102, 126, 234, 0.15);
+    }
+    100% {
+        transform: scale(1);
+        box-shadow: 0 0 0 0 rgba(102, 126, 234, 0);
+    }
+}
         .card {
             position: relative;
             width: 100%;
@@ -537,15 +555,26 @@
 
     <script>
         // Simple, smooth navigation function
-        function scrollToCard(cardNumber) {
-            const cardElement = document.querySelector(`[data-card="${cardNumber}"]`);
-            if (cardElement) {
-                cardElement.scrollIntoView({ 
-                    behavior: 'smooth', 
-                    block: 'start' 
-                });
-            }
-        }
+function scrollToCard(cardNumber) {
+    const cardElement = document.querySelector(`[data-card="${cardNumber}"]`);
+    if (cardElement) {
+        // Remove any existing focus
+        document.querySelectorAll('.card-container').forEach(card => {
+            card.classList.remove('focused');
+        });
+        
+        // Smooth scroll
+        cardElement.scrollIntoView({ 
+            behavior: 'smooth', 
+            block: 'start' 
+        });
+        
+        // Add animation after delay
+        setTimeout(() => {
+            cardElement.classList.add('focused');
+        }, 600);
+    }
+}
 
         const enneagramData = [
             {
