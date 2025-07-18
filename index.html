@@ -556,55 +556,75 @@
     <script>
         // Simple, smooth navigation function
 function scrollToCard(cardNumber) {
+    console.log('scrollToCard called with:', cardNumber); // Debug log
+    
     const cardElement = document.querySelector(`[data-card="${cardNumber}"]`);
-    if (cardElement) {
-        // Remove any existing focus
-        document.querySelectorAll('.card-container').forEach(card => {
-            card.classList.remove('focused');
+    console.log('Found card element:', cardElement); // Debug log
+    
+    if (!cardElement) {
+        console.error('Card element not found for:', cardNumber);
+        return;
+    }
+    
+    // Prevent multiple simultaneous scroll operations
+    if (window.isScrolling) {
+        console.log('Already scrolling, ignoring request');
+        return;
+    }
+    
+    window.isScrolling = true;
+    
+    // Remove any existing focus
+    document.querySelectorAll('.card-container').forEach(card => {
+        card.classList.remove('focused');
+    });
+    
+    // Detect mobile/touch devices
+    const isMobile = window.innerWidth <= 768 || 'ontouchstart' in window;
+    
+    if (isMobile) {
+        // Use browser smooth scroll on mobile (it's optimized)
+        cardElement.scrollIntoView({ 
+            behavior: 'smooth', 
+            block: 'start' 
         });
         
-        // Detect mobile/touch devices
-        const isMobile = window.innerWidth <= 768 || 'ontouchstart' in window;
+        setTimeout(() => {
+            cardElement.classList.add('focused');
+            window.isScrolling = false; // Reset flag
+        }, 800);
+    } else {
+        // Use custom scroll on desktop to avoid white flash
+        const targetPosition = cardElement.offsetTop - 120;
+        const startPosition = window.pageYOffset;
+        const distance = targetPosition - startPosition;
+        const duration = Math.min(Math.abs(distance) * 0.4, 800);
         
-        if (isMobile) {
-            // Use browser smooth scroll on mobile (it's optimized)
-            cardElement.scrollIntoView({ 
-                behavior: 'smooth', 
-                block: 'start' 
-            });
+        console.log('Scroll details:', { targetPosition, startPosition, distance, duration }); // Debug log
+        
+        let start = null;
+        
+        function smoothScrollStep(timestamp) {
+            if (!start) start = timestamp;
+            const progress = Math.min((timestamp - start) / duration, 1);
             
-            setTimeout(() => {
-                cardElement.classList.add('focused');
-            }, 800);
-        } else {
-            // Use custom scroll on desktop to avoid white flash
-            const targetPosition = cardElement.offsetTop - 120;
-            const startPosition = window.pageYOffset;
-            const distance = targetPosition - startPosition;
-            const duration = Math.min(Math.abs(distance) * 0.4, 800); // Faster
+            // Smoother easing
+            const ease = progress * (2 - progress);
+            const currentPosition = startPosition + (distance * ease);
             
-            let start = null;
+            window.scrollTo(0, currentPosition);
             
-            function smoothScrollStep(timestamp) {
-                if (!start) start = timestamp;
-                const progress = Math.min((timestamp - start) / duration, 1);
-                
-                // Smoother easing
-                const ease = progress * (2 - progress);
-                const currentPosition = startPosition + (distance * ease);
-                
-                window.scrollTo(0, currentPosition);
-                
-                if (progress < 1) {
-                    requestAnimationFrame(smoothScrollStep);
-                } else {
-                    setTimeout(() => {
-                        cardElement.classList.add('focused');
-                    }, 100);
-                }
+            if (progress < 1) {
+                requestAnimationFrame(smoothScrollStep);
+            } else {
+                setTimeout(() => {
+                    cardElement.classList.add('focused');
+                    window.isScrolling = false; // Reset flag
+                }, 100);
             }
-            
-            requestAnimationFrame(smoothScrollStep);
+        }
+        
+        requestAnimationFrame(smoothScrollStep);
         }
     }
 }
