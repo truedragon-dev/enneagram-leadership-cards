@@ -569,19 +569,22 @@ function scrollToCard(cardNumber) {
         return;
     }
     
-    // If we're already at or very close to this card, just add focus
-    const currentScroll = window.pageYOffset;
-    const targetScroll = cardElement.offsetTop - 120;
-    const distance = Math.abs(currentScroll - targetScroll);
-    
-    if (distance < 50) {
-        console.log('Already at target, just adding focus');
-        document.querySelectorAll('.card-container').forEach(card => {
-            card.classList.remove('focused');
-        });
-        cardElement.classList.add('focused');
-        return;
-    }
+ // Check if we're already at target but always show animation
+const currentScroll = window.pageYOffset;
+const targetScroll = cardElement.offsetTop - 120;
+const distance = Math.abs(currentScroll - targetScroll);
+
+// Always remove focus from other cards first
+document.querySelectorAll('.card-container').forEach(card => {
+    card.classList.remove('focused');
+});
+
+if (distance < 50) {
+    console.log('Already at target, just adding focus animation');
+    // Skip the scroll but still show the focus animation
+    cardElement.classList.add('focused');
+    return;
+}
     
     if (window.isScrolling) {
         console.log('Already scrolling, ignoring request');
