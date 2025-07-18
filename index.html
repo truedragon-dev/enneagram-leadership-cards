@@ -747,55 +747,65 @@ function scrollToCard(cardNumber) {
         ];
 
         function createCard(data) {
-            return `
-                <div class="card-container" data-card="${data.number}">
-                    <div class="card type-${data.number}" onclick="flipCard(this)">
-                        <div class="card-face type-${data.number}">
-                            <div class="type-header">
-                                <div class="type-number">${data.number}</div>
-                                <div class="type-name">${data.type.replace(/Type \d+—/, '')}</div>
-                            </div>
-                            
-                            <div class="section">
-                                <div class="section-title interaction-style">Interaction Style</div>
-                                <div class="section-content">${data.interactionStyle}</div>
-                            </div>
-                            
-                            <div class="section">
-                                <div class="section-title shadow-watch">Shadow Watch</div>
-                                <div class="section-content">${data.shadowWatch}</div>
-                            </div>
-                            
-                            <div class="section">
-                                <div class="section-title growth-edge">Growth Edge</div>
-                                <div class="section-content">${data.growthEdge}</div>
-                            </div>
-                            
-                            <div class="attribution">
-                                created by allan @ truedragon.io
-                            </div>
-                            
-                            <div class="flip-indicator">Click to flip →</div>
-                        </div>
-                        
-                        <div class="card-face card-back type-${data.number}">
-                            <div class="type-header">
-                                <div class="type-number">${data.number}</div>
-                                <div class="type-name">${data.type.replace(/Type \d+—/, '')}</div>
-                            </div>
-                            
-                            <div class="field-title">Questions for Higher Team IQ</div>
-                            
-                            ${data.fieldQuestions.map(question => 
-                                `<div class="field-question">${question}</div>`
-                            ).join('')}
-                            
-                            <div class="flip-indicator">← Click to flip back</div>
-                        </div>
+    return `
+        <div class="card-container" data-card="${data.number}">
+            <div class="card type-${data.number}" onclick="flipCard(this)">
+                <div class="card-face type-${data.number}">
+                    <div class="type-header">
+                        <div class="type-number">${data.number}</div>
+                        <div class="type-name">${data.type.replace(/Type \d+—/, '')}</div>
                     </div>
+                    
+                    <div class="section">
+                        <div class="section-title core-drive">Core Drive</div>
+                        <div class="section-content">${data.coreDrive}</div>
+                    </div>
+                    
+                    <div class="section">
+                        <div class="section-title leads-through">Leads Through</div>
+                        <div class="section-content">${data.leadsThrough}</div>
+                    </div>
+                    
+                    <div class="section">
+                        <div class="section-title interaction-style">Interaction Style</div>
+                        <div class="section-content">${data.interactionStyle}</div>
+                    </div>
+                    
+                    <div class="section">
+                        <div class="section-title shadow-watch">Shadow Watch</div>
+                        <div class="section-content">${data.shadowWatch}</div>
+                    </div>
+                    
+                    <div class="section">
+                        <div class="section-title growth-edge">Growth Edge</div>
+                        <div class="section-content">${data.growthEdge}</div>
+                    </div>
+                    
+                    <div class="attribution">
+                        created by allan @ truedragon.io
+                    </div>
+                    
+                    <div class="flip-indicator">Click to flip →</div>
                 </div>
-            `;
-        }
+                
+                <div class="card-face card-back type-${data.number}">
+                    <div class="type-header">
+                        <div class="type-number">${data.number}</div>
+                        <div class="type-name">${data.type.replace(/Type \d+—/, '')}</div>
+                    </div>
+                    
+                    <div class="field-title">Questions for Higher Team IQ</div>
+                    
+                    ${data.fieldQuestions.map(question => 
+                        `<div class="field-question">${question}</div>`
+                    ).join('')}
+                    
+                    <div class="flip-indicator">← Click to flip back</div>
+                </div>
+            </div>
+        </div>
+    `;
+}
 
         function flipCard(card) {
             card.classList.toggle('flipped');
@@ -1087,14 +1097,4 @@ function scrollToCard(cardNumber) {
         setTimeout(setupViewTracking, 1000);
     </script>
 </body>
-</html> class="section-title core-drive">Core Drive</div>
-                                <div class="section-content">${data.coreDrive}</div>
-                            </div>
-                            
-                            <div class="section">
-                                <div class="section-title leads-through">Leads Through</div>
-                                <div class="section-content">${data.leadsThrough}</div>
-                            </div>
-                            
-                            <div class="section">
-                                <div
+</html> 
