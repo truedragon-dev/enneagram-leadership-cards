@@ -596,21 +596,13 @@
             const isMobile = window.innerWidth <= 768 || 'ontouchstart' in window;
             
             if (isMobile) {
-                // Completely disable any browser scroll behavior
-                document.documentElement.style.scrollBehavior = 'auto';
-                document.body.style.scrollBehavior = 'auto';
-                
-                // Prevent any momentum or elastic scrolling during our animation
-                document.body.style.webkitOverflowScrolling = 'auto';
-                document.body.style.overscrollBehavior = 'none';
-                
+                // Completely bypass browser scroll behavior on mobile
                 const targetPosition = cardElement.offsetTop - 80;
                 const startPosition = window.pageYOffset;
                 const scrollDistance = targetPosition - startPosition;
-                const duration = Math.min(Math.abs(scrollDistance) * 0.8, 1500); // Even slower for mobile
+                const duration = Math.min(Math.abs(scrollDistance) * 0.8, 1500);
                 
                 let start = null;
-                let lastPosition = startPosition;
                 
                 function mobileScrollStep(timestamp) {
                     if (window.lastScrollTarget !== cardNumber) {
@@ -621,40 +613,31 @@
                     if (!start) start = timestamp;
                     const progress = Math.min((timestamp - start) / duration, 1);
                     
-                    // Smoother easing curve for mobile
+                    // Smooth cubic easing
                     const ease = progress < 0.5 
                         ? 4 * progress * progress * progress
                         : 1 - Math.pow(-2 * progress + 2, 3) / 2;
                     
                     const currentPosition = startPosition + (scrollDistance * ease);
                     
-                    // Only scroll if position actually changed to avoid browser conflicts
-                    if (Math.abs(currentPosition - lastPosition) > 0.5) {
-                        window.scrollTo({
-                            top: currentPosition,
-                            behavior: 'instant'
-                        });
-                        lastPosition = currentPosition;
-                    }
+                    // Use instant scrolling to avoid browser interference
+                    window.scrollTo({ top: currentPosition, behavior: 'instant' });
                     
                     if (progress < 1) {
                         requestAnimationFrame(mobileScrollStep);
                     } else {
-                        // Restore scroll behavior after animation
                         setTimeout(() => {
                             if (window.lastScrollTarget === cardNumber) {
                                 cardElement.classList.add('focused');
                             }
                             window.isScrolling = false;
-                            document.body.style.webkitOverflowScrolling = '';
-                            document.body.style.overscrollBehavior = '';
-                        }, 150);
+                        }, 100);
                     }
                 }
                 
                 requestAnimationFrame(mobileScrollStep);
             } else {
-                // Desktop smooth scroll
+                // Desktop smooth scroll (unchanged)
                 const targetPosition = cardElement.offsetTop - 120;
                 const startPosition = window.pageYOffset;
                 const scrollDistance = targetPosition - startPosition;
