@@ -223,7 +223,6 @@
         .card-container {
             perspective: 1000px;
             height: 950px;
-            scroll-margin-top: 100px; /* Offset for sticky navigation */
         }
 
         .card {
@@ -549,12 +548,26 @@
 
     <script>
         // Navigation function with focus animation
-       function scrollToCard(cardNumber) {
+function scrollToCard(cardNumber) {
     const cardElement = document.querySelector(`[data-card="${cardNumber}"]`);
     if (cardElement) {
-        cardElement.scrollIntoView({ 
-            behavior: 'smooth', 
-            block: 'center'  // Changed from 'start' to 'center'
+        // Calculate proper scroll position
+        const elementTop = cardElement.offsetTop;
+        const navHeight = 120; // Height of sticky navigation
+        const windowHeight = window.innerHeight;
+        const documentHeight = document.documentElement.scrollHeight;
+        
+        // Target position accounting for navigation
+        let targetScroll = elementTop - navHeight;
+        
+        // Don't scroll past the bottom of the document
+        const maxScroll = documentHeight - windowHeight;
+        targetScroll = Math.min(targetScroll, maxScroll);
+        
+        // Smooth scroll to calculated position
+        window.scrollTo({
+            top: targetScroll,
+            behavior: 'smooth'
         });
     }
 }
