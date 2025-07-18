@@ -552,29 +552,12 @@
        function scrollToCard(cardNumber) {
     const cardElement = document.querySelector(`[data-card="${cardNumber}"]`);
     if (cardElement) {
-        // Remove any existing focus
-        document.querySelectorAll('.card-container').forEach(card => {
-            card.classList.remove('focused');
+        cardElement.scrollIntoView({ 
+            behavior: 'smooth', 
+            block: 'center'  // Changed from 'start' to 'center'
         });
-        
-        // Calculate scroll distance for dynamic timing
-        const currentScroll = window.scrollY;
-        const targetScroll = cardElement.offsetTop - 100;
-        const scrollDistance = Math.abs(targetScroll - currentScroll);
-        
-        // Dynamic delay based on scroll distance
-        const animationDelay = Math.min(800, Math.max(200, scrollDistance / 2));
-        
-        // Scroll to card
-        cardElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        
-        // Add focus animation after dynamic delay
-        setTimeout(() => {
-            cardElement.classList.add('focused');
-        }, animationDelay);
     }
 }
-
         const enneagramData = [
             {
                 type: "Type 1—The Strict Perfectionist",
