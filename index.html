@@ -558,33 +558,29 @@
 function scrollToCard(cardNumber) {
     console.log('scrollToCard called with:', cardNumber);
     
-    // Store the intended target to prevent interference
     window.lastScrollTarget = cardNumber;
     
     const cardElement = document.querySelector(`[data-card="${cardNumber}"]`);
-    console.log('Found card element:', cardElement);
-    
     if (!cardElement) {
         console.error('Card element not found for:', cardNumber);
         return;
     }
     
- // Check if we're already at target but always show animation
-const currentScroll = window.pageYOffset;
-const targetScroll = cardElement.offsetTop - 120;
-const distance = Math.abs(currentScroll - targetScroll);
+    // Always remove focus from other cards first
+    document.querySelectorAll('.card-container').forEach(card => {
+        card.classList.remove('focused');
+    });
+    
+    // Check if we're already at target
+    const currentScroll = window.pageYOffset;
+    const targetScroll = cardElement.offsetTop - 120;
+    const distance = Math.abs(currentScroll - targetScroll);
 
-// Always remove focus from other cards first
-document.querySelectorAll('.card-container').forEach(card => {
-    card.classList.remove('focused');
-});
-
-if (distance < 50) {
-    console.log('Already at target, just adding focus animation');
-    // Skip the scroll but still show the focus animation
-    cardElement.classList.add('focused');
-    return;
-}
+    if (distance < 50) {
+        console.log('Already at target, just adding focus animation');
+        cardElement.classList.add('focused');
+        return;
+    }
     
     if (window.isScrolling) {
         console.log('Already scrolling, ignoring request');
@@ -592,10 +588,7 @@ if (distance < 50) {
     }
     
     window.isScrolling = true;
-    
-    document.querySelectorAll('.card-container').forEach(card => {
-        card.classList.remove('focused');
-    });
+    // REMOVED: The duplicate focus cleanup that was here
     
     const isMobile = window.innerWidth <= 768 || 'ontouchstart' in window;
     
@@ -606,7 +599,6 @@ if (distance < 50) {
         });
         
         setTimeout(() => {
-            // Double-check we're still targeting the same card
             if (window.lastScrollTarget === cardNumber) {
                 cardElement.classList.add('focused');
             }
@@ -618,14 +610,10 @@ if (distance < 50) {
         const scrollDistance = targetPosition - startPosition;
         const duration = Math.min(Math.abs(scrollDistance) * 0.4, 800);
         
-        console.log('Scroll details:', { targetPosition, startPosition, scrollDistance, duration });
-        
         let start = null;
         
         function smoothScrollStep(timestamp) {
-            // Check if scroll target changed during animation
             if (window.lastScrollTarget !== cardNumber) {
-                console.log('Scroll target changed, aborting');
                 window.isScrolling = false;
                 return;
             }
@@ -642,7 +630,6 @@ if (distance < 50) {
                 requestAnimationFrame(smoothScrollStep);
             } else {
                 setTimeout(() => {
-                    // Final check before adding focus
                     if (window.lastScrollTarget === cardNumber) {
                         cardElement.classList.add('focused');
                     }
