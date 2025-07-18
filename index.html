@@ -127,7 +127,6 @@
         }
 
         .nav-button {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             border: none;
             padding: 10px 16px;
@@ -144,9 +143,48 @@
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
         }
 
+        /* Type-specific navigation button colors */
+        .nav-button[data-type="1"] { background: #e76f51; }
+        .nav-button[data-type="2"] { background: #4a9b4a; }
+        .nav-button[data-type="3"] { background: #2d6a4f; }
+        .nav-button[data-type="4"] { background: #4a9b8e; }
+        .nav-button[data-type="5"] { background: #1e6091; }
+        .nav-button[data-type="6"] { background: #6a4c93; }
+        .nav-button[data-type="7"] { background: #457b9d; }
+        .nav-button[data-type="8"] { background: #a63446; }
+        .nav-button[data-type="9"] { background: #b8956a; }
+
         .nav-button.experiment {
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            color: #764ba2;
+            padding: 8px 12px;
+        }
+
+        .nav-button.experiment:hover {
             background: linear-gradient(135deg, #9f7aea 0%, #553c9a 100%);
-            padding: 10px 12px;
+            color: white;
+            border-color: transparent;
+        }
+
+        /* Focus highlight animation */
+        .card-container.focused {
+            animation: cardFocus 1.5s ease-out;
+        }
+
+        @keyframes cardFocus {
+            0% {
+                transform: scale(1);
+                box-shadow: 0 0 0 0 rgba(102, 126, 234, 0.6);
+            }
+            25% {
+                transform: scale(1.02);
+                box-shadow: 0 0 0 20px rgba(102, 126, 234, 0.2);
+            }
+            100% {
+                transform: scale(1);
+                box-shadow: 0 0 0 0 rgba(102, 126, 234, 0);
+            }
         }
 
         h1 {
@@ -484,15 +522,15 @@
         <!-- Navigation Header -->
         <div class="navigation">
             <div class="nav-buttons">
-                <button class="nav-button" onclick="scrollToCard(1)">1</button>
-                <button class="nav-button" onclick="scrollToCard(2)">2</button>
-                <button class="nav-button" onclick="scrollToCard(3)">3</button>
-                <button class="nav-button" onclick="scrollToCard(4)">4</button>
-                <button class="nav-button" onclick="scrollToCard(5)">5</button>
-                <button class="nav-button" onclick="scrollToCard(6)">6</button>
-                <button class="nav-button" onclick="scrollToCard(7)">7</button>
-                <button class="nav-button" onclick="scrollToCard(8)">8</button>
-                <button class="nav-button" onclick="scrollToCard(9)">9</button>
+                <button class="nav-button" data-type="1" onclick="scrollToCard(1)">1</button>
+                <button class="nav-button" data-type="2" onclick="scrollToCard(2)">2</button>
+                <button class="nav-button" data-type="3" onclick="scrollToCard(3)">3</button>
+                <button class="nav-button" data-type="4" onclick="scrollToCard(4)">4</button>
+                <button class="nav-button" data-type="5" onclick="scrollToCard(5)">5</button>
+                <button class="nav-button" data-type="6" onclick="scrollToCard(6)">6</button>
+                <button class="nav-button" data-type="7" onclick="scrollToCard(7)">7</button>
+                <button class="nav-button" data-type="8" onclick="scrollToCard(8)">8</button>
+                <button class="nav-button" data-type="9" onclick="scrollToCard(9)">9</button>
                 <button class="nav-button experiment" onclick="scrollToCard('experiment')">⚡</button>
             </div>
         </div>
@@ -510,11 +548,22 @@
     </div>
 
     <script>
-        // Navigation function
+        // Navigation function with focus animation
         function scrollToCard(cardNumber) {
             const cardElement = document.querySelector(`[data-card="${cardNumber}"]`);
             if (cardElement) {
+                // Remove any existing focus
+                document.querySelectorAll('.card-container').forEach(card => {
+                    card.classList.remove('focused');
+                });
+                
+                // Scroll to card
                 cardElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                
+                // Add focus animation after scroll
+                setTimeout(() => {
+                    cardElement.classList.add('focused');
+                }, 800);
             }
         }
 
