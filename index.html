@@ -168,7 +168,7 @@
         }
 
         /* Focus highlight animation */
-      .card-container.focused {
+     .card-container.focused {
     animation: cardFocus 1.2s ease-out;
 }
 
@@ -551,7 +551,7 @@
 function scrollToCard(cardNumber) {
     const cardElement = document.querySelector(`[data-card="${cardNumber}"]`);
     if (cardElement) {
-        // Remove any existing focus
+        // Remove any existing focus and listeners
         document.querySelectorAll('.card-container').forEach(card => {
             card.classList.remove('focused');
         });
@@ -566,37 +566,25 @@ function scrollToCard(cardNumber) {
         const maxScroll = documentHeight - windowHeight;
         targetScroll = Math.min(targetScroll, maxScroll);
         
-        // Smooth scroll to calculated position
+        // Store the current scroll position
+        const startScroll = window.scrollY;
+        const distance = Math.abs(targetScroll - startScroll);
+        
+        // Calculate animation delay based on distance
+        const baseDelay = 300;
+        const additionalDelay = Math.min(distance / 3, 500);
+        const totalDelay = baseDelay + additionalDelay;
+        
+        // Smooth scroll
         window.scrollTo({
             top: targetScroll,
             behavior: 'smooth'
         });
         
-        // Detect when scroll actually finishes
-        let isScrolling = false;
-        let scrollTimer;
-        
-        const onScroll = () => {
-            isScrolling = true;
-            clearTimeout(scrollTimer);
-            
-            scrollTimer = setTimeout(() => {
-                isScrolling = false;
-                // Add animation after scroll completes
-                cardElement.classList.add('focused');
-                window.removeEventListener('scroll', onScroll);
-            }, 100); // Wait 100ms after scroll stops
-        };
-        
-        window.addEventListener('scroll', onScroll);
-        
-        // Fallback: remove listener after 3 seconds
+        // Simple timeout-based animation (more reliable)
         setTimeout(() => {
-            window.removeEventListener('scroll', onScroll);
-            if (!cardElement.classList.contains('focused')) {
-                cardElement.classList.add('focused');
-            }
-        }, 3000);
+            cardElement.classList.add('focused');
+        }, totalDelay);
     }
 }
         const enneagramData = [
