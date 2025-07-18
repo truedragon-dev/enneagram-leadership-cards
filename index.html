@@ -933,7 +933,7 @@ function scrollToCard(cardNumber) {
 
         // Initialize cards
         renderCards();
-/*
+
         // Analytics tracking setup
         let cardSession = {
           startTime: Date.now(),
@@ -1089,7 +1089,7 @@ function scrollToCard(cardNumber) {
           clearTimeout(inactivityTimer);
           inactivityTimer = setTimeout(trackSessionSummary, 30000);
         }
-*/
+
     // Event listeners
 window.addEventListener('beforeunload', function() {
   currentlyViewedCards.forEach((startTime, enneagramType) => {
@@ -1112,12 +1112,12 @@ window.addEventListener('beforeunload', function() {
 
 // Single improved click listener that excludes navigation buttons
 document.addEventListener('click', function(e) {
-  // Skip if click is on a navigation button
+  // SKIP navigation buttons entirely - don't track or interfere
   if (e.target.closest('.nav-button')) {
     return;
   }
   
-  // Reset inactivity timer for any non-nav click
+  // Reset inactivity timer for non-nav clicks only
   resetInactivityTimer();
   
   // Track card flips only for actual card clicks
