@@ -89,7 +89,7 @@
         }
 
         html {
-            scroll-behavior: smooth;
+            scroll-behavior: auto;
             background: #667eea;
         }
 
@@ -100,6 +100,8 @@
             padding: 20px;
             color: #333;
             background-attachment: fixed;
+            -webkit-overflow-scrolling: auto;
+            overscroll-behavior: none;
         }
 
         .container {
@@ -593,41 +595,82 @@
             
             const isMobile = window.innerWidth <= 768 || 'ontouchstart' in window;
             
-            // Use custom smooth scroll for both mobile and desktop
-            const targetPosition = cardElement.offsetTop - (isMobile ? 80 : 120);
-            const startPosition = window.pageYOffset;
-            const scrollDistance = targetPosition - startPosition;
-            const duration = Math.min(Math.abs(scrollDistance) * (isMobile ? 0.5 : 0.4), isMobile ? 1000 : 800);
-
-            let start = null;
-
-            function smoothScrollStep(timestamp) {
-                if (window.lastScrollTarget !== cardNumber) {
-                    window.isScrolling = false;
-                    return;
-                }
+            if (isMobile) {
+                // Disable any existing scrolling first
+                document.documentElement.style.scrollBehavior = 'auto';
                 
-                if (!start) start = timestamp;
-                const progress = Math.min((timestamp - start) / duration, 1);
+                const targetPosition = cardElement.offsetTop - 80;
+                const startPosition = window.pageYOffset;
+                const scrollDistance = targetPosition - startPosition;
+                const duration = Math.min(Math.abs(scrollDistance) * 0.6, 1200); // Slower for mobile
                 
-                const ease = progress * (2 - progress);
-                const currentPosition = startPosition + (scrollDistance * ease);
+                let start = null;
                 
-                window.scrollTo(0, currentPosition);
-                
-                if (progress < 1) {
-                    requestAnimationFrame(smoothScrollStep);
-                } else {
-                    setTimeout(() => {
-                        if (window.lastScrollTarget === cardNumber) {
-                            cardElement.classList.add('focused');
-                        }
+                function mobileScrollStep(timestamp) {
+                    if (window.lastScrollTarget !== cardNumber) {
                         window.isScrolling = false;
-                    }, 100);
+                        return;
+                    }
+                    
+                    if (!start) start = timestamp;
+                    const progress = Math.min((timestamp - start) / duration, 1);
+                    
+                    // More aggressive easing for mobile
+                    const ease = 1 - Math.pow(1 - progress, 3);
+                    const currentPosition = startPosition + (scrollDistance * ease);
+                    
+                    window.scrollTo(0, currentPosition);
+                    
+                    if (progress < 1) {
+                        requestAnimationFrame(mobileScrollStep);
+                    } else {
+                        setTimeout(() => {
+                            if (window.lastScrollTarget === cardNumber) {
+                                cardElement.classList.add('focused');
+                            }
+                            window.isScrolling = false;
+                        }, 100);
+                    }
                 }
-            }
+                
+                requestAnimationFrame(mobileScrollStep);
+            } else {
+                // Desktop smooth scroll
+                const targetPosition = cardElement.offsetTop - 120;
+                const startPosition = window.pageYOffset;
+                const scrollDistance = targetPosition - startPosition;
+                const duration = Math.min(Math.abs(scrollDistance) * 0.4, 800);
 
-            requestAnimationFrame(smoothScrollStep);
+                let start = null;
+
+                function smoothScrollStep(timestamp) {
+                    if (window.lastScrollTarget !== cardNumber) {
+                        window.isScrolling = false;
+                        return;
+                    }
+                    
+                    if (!start) start = timestamp;
+                    const progress = Math.min((timestamp - start) / duration, 1);
+                    
+                    const ease = progress * (2 - progress);
+                    const currentPosition = startPosition + (scrollDistance * ease);
+                    
+                    window.scrollTo(0, currentPosition);
+                    
+                    if (progress < 1) {
+                        requestAnimationFrame(smoothScrollStep);
+                    } else {
+                        setTimeout(() => {
+                            if (window.lastScrollTarget === cardNumber) {
+                                cardElement.classList.add('focused');
+                            }
+                            window.isScrolling = false;
+                        }, 100);
+                    }
+                }
+
+                requestAnimationFrame(smoothScrollStep);
+            }
         }
 
         const enneagramData = [
