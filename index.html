@@ -573,14 +573,14 @@
     </div>
 
     <script>
-       function scrollToCard(cardNumber) {
+function scrollToCard(cardNumber) {
   const cardElement = document.querySelector(`[data-card="${cardNumber}"]`);
   if (!cardElement) {
     console.error('Card element not found for:', cardNumber);
     return;
   }
 
-  // Remove previously focused state
+  // Clear focused state from all
   document.querySelectorAll('.card-container').forEach(card => {
     card.classList.remove('focused');
   });
@@ -591,13 +591,19 @@
     block: 'start'
   });
 
-  // Wait long enough for iOS to finish scrolling cleanly before adding animation
-  setTimeout(() => {
-    cardElement.classList.add('focused');
-  }, 600); // this delay avoids layout conflict during scroll
+  // Instead of setTimeout — let the browser tell us when it's ready
+  if ('requestIdleCallback' in window) {
+    requestIdleCallback(() => {
+      cardElement.classList.add('focused');
+    }, { timeout: 800 });
+  } else {
+    // Fallback for non-iOS
+    setTimeout(() => {
+      cardElement.classList.add('focused');
+    }, 600);
+  }
 }
-
-       const enneagramData = [
+        const enneagramData = [
             {
                 type: "Type 1—The Strict Perfectionist",
                 number: "1",
