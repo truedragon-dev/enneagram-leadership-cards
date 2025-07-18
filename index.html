@@ -563,16 +563,35 @@ function scrollToCard(cardNumber) {
             card.classList.remove('focused');
         });
         
-        // Smooth scroll
-        cardElement.scrollIntoView({ 
-            behavior: 'smooth', 
-            block: 'start' 
-        });
+        // Calculate target position
+        const targetPosition = cardElement.offsetTop - 120;
+        const startPosition = window.pageYOffset;
+        const distance = targetPosition - startPosition;
+        const duration = Math.min(Math.abs(distance) * 0.5, 1000); // Max 1 second
         
-        // Add animation after delay
-        setTimeout(() => {
-            cardElement.classList.add('focused');
-        }, 600);
+        let start = null;
+        
+        function smoothScrollStep(timestamp) {
+            if (!start) start = timestamp;
+            const progress = Math.min((timestamp - start) / duration, 1);
+            
+            // Easing function for smooth deceleration
+            const ease = 1 - Math.pow(1 - progress, 3);
+            const currentPosition = startPosition + (distance * ease);
+            
+            window.scrollTo(0, currentPosition);
+            
+            if (progress < 1) {
+                requestAnimationFrame(smoothScrollStep);
+            } else {
+                // Add animation after scroll completes
+                setTimeout(() => {
+                    cardElement.classList.add('focused');
+                }, 100);
+            }
+        }
+        
+        requestAnimationFrame(smoothScrollStep);
     }
 }
 
