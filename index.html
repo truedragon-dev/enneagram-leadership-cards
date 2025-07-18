@@ -12,7 +12,7 @@
 
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Enneagram Leadership Cards</title>
+    <title>Enneagram Leadership Cards v25</title>
     
     <!-- PWA Meta Tags -->
     <link rel="manifest" href="manifest.json">
@@ -89,20 +89,16 @@
         }
 
         html {
-            /* Use native iOS scroll behavior */
-            scroll-behavior: smooth;
+            scroll-behavior: auto;
             -webkit-overflow-scrolling: touch;
         }
 
         body {
             font-family: 'Georgia', serif;
-            /* Fixed gradient background - no attachment issues */
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
             padding: 20px;
             color: #333;
-            /* Remove problematic background-attachment */
-            /* Optimize for iOS scrolling */
             -webkit-overflow-scrolling: touch;
             overscroll-behavior: none;
         }
@@ -114,19 +110,18 @@
             border-radius: 20px;
             padding: 40px;
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-            /* Remove transform optimizations that cause issues */
         }
 
-        /* Simplified Navigation - No sticky on iOS */
+        /* Navigation Styles - Fixed for iOS */
         .navigation {
-            background: rgba(255, 255, 255, 0.98);
+            position: sticky;
+            top: 0;
+            background: rgba(255, 255, 255, 0.95);
             padding: 20px 0;
             margin: -40px -40px 30px -40px;
             border-radius: 20px 20px 0 0;
+            z-index: 100;
             border-bottom: 1px solid rgba(102, 126, 234, 0.2);
-            /* Remove sticky positioning for iOS */
-            position: relative;
-            /* Remove backdrop-filter for better performance */
         }
 
         .nav-buttons {
@@ -145,20 +140,15 @@
             font-size: 14px;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.2s ease;
+            transition: all 0.3s ease;
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-            /* Optimize for touch */
             -webkit-tap-highlight-color: transparent;
             touch-action: manipulation;
         }
 
         .nav-button:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.15);
-        }
-
-        .nav-button:active {
-            transform: translateY(0);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
         }
 
         /* Type-specific navigation button colors */
@@ -173,14 +163,15 @@
         .nav-button[data-type="9"] { background: #b8956a; }
 
         .nav-button.experiment {
-            background: rgba(102, 126, 234, 0.8);
+            background: rgba(255, 255, 255, 0.2);
             border: 2px solid rgba(255, 255, 255, 0.3);
-            color: white;
+            color: #764ba2;
             padding: 8px 12px;
         }
 
         .nav-button.experiment:hover {
-            background: #553c9a;
+            background: linear-gradient(135deg, #9f7aea 0%, #553c9a 100%);
+            color: white;
             border-color: transparent;
         }
 
@@ -220,11 +211,10 @@
         .card-container {
             perspective: 1000px;
             height: 950px;
-            /* Better scroll targeting for iOS */
-            scroll-margin-top: 20px;
+            scroll-margin-top: 120px;
         }
 
-        /* Simplified focus animation */
+        /* iOS-optimized focus animation */
         .card-container.focused {
             animation: cardFocus 0.8s ease-out;
         }
@@ -232,12 +222,15 @@
         @keyframes cardFocus {
             0% {
                 transform: scale(1);
+                box-shadow: 0 0 0 0 rgba(102, 126, 234, 0);
             }
-            50% {
-                transform: scale(1.02);
+            40% {
+                transform: scale(1.01);
+                box-shadow: 0 0 0 10px rgba(102, 126, 234, 0.15);
             }
             100% {
                 transform: scale(1);
+                box-shadow: 0 0 0 0 rgba(102, 126, 234, 0);
             }
         }
 
@@ -246,10 +239,8 @@
             width: 100%;
             height: 100%;
             transform-style: preserve-3d;
-            transition: transform 0.6s ease;
+            transition: transform 0.8s ease;
             cursor: pointer;
-            /* Optimize for touch */
-            -webkit-tap-highlight-color: transparent;
         }
 
         .card.flipped {
@@ -269,8 +260,6 @@
             overflow-y: auto;
             display: flex;
             flex-direction: column;
-            /* iOS scroll optimization */
-            -webkit-overflow-scrolling: touch;
         }
 
         .card-back {
@@ -505,8 +494,6 @@
             
             .navigation {
                 margin: -20px -20px 20px -20px;
-                /* Ensure navigation stays visible on mobile */
-                position: relative;
             }
             
             .nav-buttons {
@@ -517,12 +504,6 @@
             .nav-button {
                 padding: 8px 12px;
                 font-size: 13px;
-                /* Better touch targets */
-                min-height: 44px;
-                min-width: 44px;
-                display: flex;
-                align-items: center;
-                justify-content: center;
             }
             
             .nav-button.experiment {
@@ -539,7 +520,7 @@
             
             .card-container {
                 height: 850px;
-                scroll-margin-top: 20px;
+                scroll-margin-top: 80px;
             }
         }
     </style>
@@ -575,10 +556,8 @@
     </div>
 
     <script>
-        // Simplified iOS-friendly scroll function
+        // iOS-optimized scroll function - v25 fix
         function scrollToCard(cardNumber) {
-            console.log('scrollToCard called with:', cardNumber);
-            
             const cardElement = document.querySelector(`[data-card="${cardNumber}"]`);
             if (!cardElement) {
                 console.error('Card element not found for:', cardNumber);
@@ -590,30 +569,16 @@
                 card.classList.remove('focused');
             });
             
-            // Use native browser scrolling for iOS compatibility
-            const targetPosition = cardElement.offsetTop - 20;
+            // Use native scrollIntoView for iOS compatibility
+            cardElement.scrollIntoView({
+                behavior: 'smooth',
+                block: 'start'
+            });
             
-            // Check if we're on iOS
-            const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
-            
-            if (isIOS) {
-                // Use instant scroll for iOS to avoid conflicts
-                window.scrollTo({
-                    top: targetPosition,
-                    behavior: 'smooth'
-                });
-            } else {
-                // Use smooth scroll for other devices
-                window.scrollTo({
-                    top: targetPosition,
-                    behavior: 'smooth'
-                });
-            }
-            
-            // Add focus animation after a brief delay
+            // Add focus animation after scroll completes
             setTimeout(() => {
                 cardElement.classList.add('focused');
-            }, 300);
+            }, 600);
         }
 
         const enneagramData = [
@@ -1055,7 +1020,7 @@
           inactivityTimer = setTimeout(trackSessionSummary, 30000);
         }
 
-        // Event listeners - optimized for iOS
+        // Event listeners
         window.addEventListener('beforeunload', function() {
           currentlyViewedCards.forEach((startTime, enneagramType) => {
             const timeSpent = Math.round((Date.now() - startTime) / 1000);
@@ -1075,16 +1040,16 @@
           trackSessionSummary();
         });
 
-        // Optimized click listener for iOS
+        // Click listener - excludes navigation buttons
         document.addEventListener('click', function(e) {
-          // Skip navigation buttons
+          // SKIP navigation buttons entirely
           if (e.target.closest('.nav-button')) {
             return;
           }
           
           resetInactivityTimer();
           
-          // Track card flips
+          // Track card flips only for actual card clicks
           const card = e.target.closest('.card');
           if (card) {
             const typeMatch = card.className.match(/type-(\d+)/);
@@ -1097,10 +1062,9 @@
               trackCardFlip(enneagramType, currentSide);
             }, 50);
           }
-        }, { passive: true });
+        });
 
-        // Optimize touch events for iOS
-        document.addEventListener('touchstart', resetInactivityTimer, { passive: true });
+        document.addEventListener('keypress', resetInactivityTimer);
 
         // Initial page load tracking
         gtag('event', 'page_load', {
