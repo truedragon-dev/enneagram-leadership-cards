@@ -1,8 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-    {
-  scroll-behavior: auto; /* disable global smooth scroll */
-}
 <head>
     <!-- Google tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-5VFNX8QJB3"></script>
@@ -91,6 +88,10 @@
             box-sizing: border-box;
         }
 
+        html {
+            scroll-behavior: smooth;
+        }
+
         body {
             font-family: 'Georgia', serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -98,31 +99,16 @@
             padding: 20px;
             color: #333;
         }
-html {
-  background-color: #667eea;
-  scroll-behavior: smooth;
-}
 
-.container {
-  max-width: 1400px;
-  margin: 0 auto;
-  background: rgba(255, 255, 255, 0.95);
-  border-radius: 20px;
-  padding: 40px;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-  will-change: transform;
-  transform: translateZ(0);
-    contain: layout paint;
-}
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
 
-.card-container {
-  scroll-margin-top: 120px;
-  perspective: 1000px;
-  will-change: transform;
-  transform: translateZ(0);
-      content-visibility: auto;              /* ← NEW */
-  contain-intrinsic-size: 950px; 
-}
         /* Navigation Styles */
         .navigation {
             position: sticky;
@@ -185,26 +171,6 @@ html {
             border-color: transparent;
         }
 
-        /* Focus highlight animation */
-     .card-container.focused {
-    animation: cardFocus 1.2s ease-out;
-}
-
-@keyframes cardFocus {
-    0% {
-        transform: scale(1);
-        box-shadow: 0 0 0 0 rgba(102, 126, 234, 0);
-    }
-    40% {
-        transform: scale(1.01);
-        box-shadow: 0 0 0 15px rgba(102, 126, 234, 0.15);
-    }
-    100% {
-        transform: scale(1);
-        box-shadow: 0 0 0 0 rgba(102, 126, 234, 0);
-    }
-}
-
         h1 {
             text-align: center;
             font-size: 2.5em;
@@ -241,6 +207,7 @@ html {
         .card-container {
             perspective: 1000px;
             height: 950px;
+            scroll-margin-top: 120px;
         }
 
         .card {
@@ -565,31 +532,17 @@ html {
     </div>
 
     <script>
-        // Navigation function with focus animation
-function scrollToCard(cardNumber) {
-  const target = document.getElementById(`card-${cardNumber}`);
-  if (!target) return;
+        // Simple, smooth navigation function
+        function scrollToCard(cardNumber) {
+            const cardElement = document.querySelector(`[data-card="${cardNumber}"]`);
+            if (cardElement) {
+                cardElement.scrollIntoView({ 
+                    behavior: 'smooth', 
+                    block: 'start' 
+                });
+            }
+        }
 
-  const container = document.querySelector('.container');
-
-  // Optional: Prevent spamming clicks during transition
-  container.style.pointerEvents = 'none';
-
-  // Fade out
-  container.style.transition = 'opacity 0.25s ease';
-  container.style.opacity = '0';
-
-  setTimeout(() => {
-    // Instant scroll jump
-    target.scrollIntoView({ behavior: 'auto', block: 'start' });
-
-    setTimeout(() => {
-      // Fade back in
-      container.style.opacity = '1';
-      container.style.pointerEvents = 'auto';
-    }, 60); // Allow small buffer
-  }, 180); // Fade out duration
-}
         const enneagramData = [
             {
                 type: "Type 1—The Strict Perfectionist",
@@ -736,16 +689,6 @@ function scrollToCard(cardNumber) {
                             <div class="type-header">
                                 <div class="type-number">${data.number}</div>
                                 <div class="type-name">${data.type.replace(/Type \d+—/, '')}</div>
-                            </div>
-                            
-                            <div class="section">
-                                <div class="section-title core-drive">Core Drive</div>
-                                <div class="section-content">${data.coreDrive}</div>
-                            </div>
-                            
-                            <div class="section">
-                                <div class="section-title leads-through">Leads Through</div>
-                                <div class="section-content">${data.leadsThrough}</div>
                             </div>
                             
                             <div class="section">
@@ -1079,4 +1022,14 @@ function scrollToCard(cardNumber) {
         setTimeout(setupViewTracking, 1000);
     </script>
 </body>
-</html>
+</html> class="section-title core-drive">Core Drive</div>
+                                <div class="section-content">${data.coreDrive}</div>
+                            </div>
+                            
+                            <div class="section">
+                                <div class="section-title leads-through">Leads Through</div>
+                                <div class="section-content">${data.leadsThrough}</div>
+                            </div>
+                            
+                            <div class="section">
+                                <div
