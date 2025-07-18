@@ -95,16 +95,25 @@
             padding: 20px;
             color: #333;
         }
+html {
+  background-color: #667eea;
+  scroll-behavior: smooth;
+}
 
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-            background: rgba(255, 255, 255, 0.95);
-            border-radius: 20px;
-            padding: 40px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-        }
+.container {
+  max-width: 1400px;
+  margin: 0 auto;
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 20px;
+  padding: 40px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+  will-change: transform;
+  transform: translateZ(0);
+}
 
+.card-container {
+  scroll-margin-top: 120px;
+}
         /* Navigation Styles */
         .navigation {
             position: sticky;
@@ -549,43 +558,18 @@
     <script>
         // Navigation function with focus animation
 function scrollToCard(cardNumber) {
-    const cardElement = document.querySelector(`[data-card="${cardNumber}"]`);
-    if (cardElement) {
-        // Remove any existing focus and listeners
-        document.querySelectorAll('.card-container').forEach(card => {
-            card.classList.remove('focused');
-        });
-        
-        // Calculate proper scroll position
-        const elementTop = cardElement.offsetTop;
-        const navHeight = 120;
-        const windowHeight = window.innerHeight;
-        const documentHeight = document.documentElement.scrollHeight;
-        
-        let targetScroll = elementTop - navHeight;
-        const maxScroll = documentHeight - windowHeight;
-        targetScroll = Math.min(targetScroll, maxScroll);
-        
-        // Store the current scroll position
-        const startScroll = window.scrollY;
-        const distance = Math.abs(targetScroll - startScroll);
-        
-        // Calculate animation delay based on distance
-        const baseDelay = 300;
-        const additionalDelay = Math.min(distance / 3, 500);
-        const totalDelay = baseDelay + additionalDelay;
-        
-        // Smooth scroll
-        window.scrollTo({
-            top: targetScroll,
-            behavior: 'smooth'
-        });
-        
-        // Simple timeout-based animation (more reliable)
-        setTimeout(() => {
-            cardElement.classList.add('focused');
-        }, totalDelay);
-    }
+  const cardElement = document.querySelector(`[data-card="${cardNumber}"]`);
+  if (cardElement) {
+    document.querySelectorAll('.card-container').forEach(card => {
+      card.classList.remove('focused');
+    });
+
+    cardElement.scrollIntoView({ behavior: 'smooth' });
+
+    setTimeout(() => {
+      cardElement.classList.add('focused');
+    }, 600);
+  }
 }
         const enneagramData = [
             {
