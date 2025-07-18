@@ -1060,45 +1060,52 @@ function scrollToCard(cardNumber) {
           inactivityTimer = setTimeout(trackSessionSummary, 30000);
         }
 
-        // Event listeners
-        window.addEventListener('beforeunload', function() {
-          currentlyViewedCards.forEach((startTime, enneagramType) => {
-            const timeSpent = Math.round((Date.now() - startTime) / 1000);
-            if (timeSpent >= 2) {
-              const existingTime = cardEngagementTimes.get(enneagramType) || 0;
-              cardEngagementTimes.set(enneagramType, existingTime + timeSpent);
-              
-              gtag('event', 'final_card_engagement', {
-                'event_category': 'session_end',
-                'enneagram_type': enneagramType,
-                'engagement_seconds': timeSpent,
-                'total_card_time': cardEngagementTimes.get(enneagramType)
-              });
-            }
-          });
-          
-          trackSessionSummary();
-        });
+    // Event listeners
+window.addEventListener('beforeunload', function() {
+  currentlyViewedCards.forEach((startTime, enneagramType) => {
+    const timeSpent = Math.round((Date.now() - startTime) / 1000);
+    if (timeSpent >= 2) {
+      const existingTime = cardEngagementTimes.get(enneagramType) || 0;
+      cardEngagementTimes.set(enneagramType, existingTime + timeSpent);
+      
+      gtag('event', 'final_card_engagement', {
+        'event_category': 'session_end',
+        'enneagram_type': enneagramType,
+        'engagement_seconds': timeSpent,
+        'total_card_time': cardEngagementTimes.get(enneagramType)
+      });
+    }
+  });
+  
+  trackSessionSummary();
+});
 
-        document.addEventListener('click', resetInactivityTimer);
-        document.addEventListener('keypress', resetInactivityTimer);
+// Single improved click listener that excludes navigation buttons
+document.addEventListener('click', function(e) {
+  // Skip if click is on a navigation button
+  if (e.target.closest('.nav-button')) {
+    return;
+  }
+  
+  // Reset inactivity timer for any non-nav click
+  resetInactivityTimer();
+  
+  // Track card flips only for actual card clicks
+  const card = e.target.closest('.card');
+  if (card) {
+    const typeMatch = card.className.match(/type-(\d+)/);
+    const enneagramType = typeMatch ? typeMatch[1] : 'experiment';
+    
+    setTimeout(() => {
+      const isShowingTeam = card.classList.contains('flipped');
+      const currentSide = isShowingTeam ? 'team' : 'individual';
+      
+      trackCardFlip(enneagramType, currentSide);
+    }, 50);
+  }
+});
 
-        document.addEventListener('click', function(e) {
-          const card = e.target.closest('.card');
-          
-          if (card) {
-            const typeMatch = card.className.match(/type-(\d+)/);
-            const enneagramType = typeMatch ? typeMatch[1] : 'experiment';
-            
-            setTimeout(() => {
-              const isShowingTeam = card.classList.contains('flipped');
-              const currentSide = isShowingTeam ? 'team' : 'individual';
-              
-              trackCardFlip(enneagramType, currentSide);
-              resetInactivityTimer();
-            }, 50);
-          }
-        });
+document.addEventListener('keypress', resetInactivityTimer);
 
         // Initial page load tracking
         gtag('event', 'page_load', {
