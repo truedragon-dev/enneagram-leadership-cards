@@ -491,25 +491,39 @@
 
         @media (max-width: 768px) {
             .container {
-                padding: 20px;
+                padding: 15px;
             }
             
             .navigation {
-                margin: -20px -20px 20px -20px;
+                margin: -15px -15px 25px -15px;
+                padding: 15px 0;
+                position: sticky;
+                top: 0;
             }
             
             .nav-buttons {
-                gap: 6px;
-                padding: 0 10px;
+                gap: 8px;
+                padding: 0 15px;
+                justify-content: center;
+                flex-wrap: wrap;
             }
             
             .nav-button {
-                padding: 8px 12px;
-                font-size: 13px;
+                padding: 12px 14px;
+                font-size: 16px;
+                min-width: 44px;
+                min-height: 44px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                border-radius: 22px;
             }
             
             .nav-button.experiment {
-                padding: 8px 10px;
+                padding: 10px 12px;
+                min-width: 48px;
+                min-height: 44px;
+                font-size: 18px;
             }
             
             .grid {
@@ -518,11 +532,12 @@
             
             h1 {
                 font-size: 2em;
+                margin-top: 10px;
             }
             
             .card-container {
                 height: 850px;
-                scroll-margin-top: 80px;
+                scroll-margin-top: 100px;
             }
         }
     </style>
@@ -596,46 +611,24 @@
             const isMobile = window.innerWidth <= 768 || 'ontouchstart' in window;
             
             if (isMobile) {
-                // Completely bypass browser scroll behavior on mobile
-                const targetPosition = cardElement.offsetTop - 80;
+                // Simple, slower scroll for mobile
+                const targetPosition = cardElement.offsetTop - 100;
                 const startPosition = window.pageYOffset;
                 const scrollDistance = targetPosition - startPosition;
-                const duration = Math.min(Math.abs(scrollDistance) * 0.8, 1500);
                 
-                let start = null;
+                // Use browser's smooth scroll but with slower timing
+                cardElement.scrollIntoView({ 
+                    behavior: 'smooth', 
+                    block: 'start'
+                });
                 
-                function mobileScrollStep(timestamp) {
-                    if (window.lastScrollTarget !== cardNumber) {
-                        window.isScrolling = false;
-                        return;
+                // Add focus after scroll completes
+                setTimeout(() => {
+                    if (window.lastScrollTarget === cardNumber) {
+                        cardElement.classList.add('focused');
                     }
-                    
-                    if (!start) start = timestamp;
-                    const progress = Math.min((timestamp - start) / duration, 1);
-                    
-                    // Smooth cubic easing
-                    const ease = progress < 0.5 
-                        ? 4 * progress * progress * progress
-                        : 1 - Math.pow(-2 * progress + 2, 3) / 2;
-                    
-                    const currentPosition = startPosition + (scrollDistance * ease);
-                    
-                    // Use instant scrolling to avoid browser interference
-                    window.scrollTo({ top: currentPosition, behavior: 'instant' });
-                    
-                    if (progress < 1) {
-                        requestAnimationFrame(mobileScrollStep);
-                    } else {
-                        setTimeout(() => {
-                            if (window.lastScrollTarget === cardNumber) {
-                                cardElement.classList.add('focused');
-                            }
-                            window.isScrolling = false;
-                        }, 100);
-                    }
-                }
-                
-                requestAnimationFrame(mobileScrollStep);
+                    window.isScrolling = false;
+                }, 1000);
             } else {
                 // Desktop smooth scroll (unchanged)
                 const targetPosition = cardElement.offsetTop - 120;
