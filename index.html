@@ -168,24 +168,24 @@
         }
 
         /* Focus highlight animation */
-        .card-container.focused {
-            animation: cardFocus 1.5s ease-out;
-        }
+      .card-container.focused {
+    animation: cardFocus 1.2s ease-out;
+}
 
-        @keyframes cardFocus {
-            0% {
-                transform: scale(1);
-                box-shadow: 0 0 0 0 rgba(102, 126, 234, 0.6);
-            }
-            25% {
-                transform: scale(1.02);
-                box-shadow: 0 0 0 20px rgba(102, 126, 234, 0.2);
-            }
-            100% {
-                transform: scale(1);
-                box-shadow: 0 0 0 0 rgba(102, 126, 234, 0);
-            }
-        }
+@keyframes cardFocus {
+    0% {
+        transform: scale(1);
+        box-shadow: 0 0 0 0 rgba(102, 126, 234, 0);
+    }
+    40% {
+        transform: scale(1.01);
+        box-shadow: 0 0 0 15px rgba(102, 126, 234, 0.15);
+    }
+    100% {
+        transform: scale(1);
+        box-shadow: 0 0 0 0 rgba(102, 126, 234, 0);
+    }
+}
 
         h1 {
             text-align: center;
@@ -549,23 +549,23 @@
 
     <script>
         // Navigation function with focus animation
-        function scrollToCard(cardNumber) {
-            const cardElement = document.querySelector(`[data-card="${cardNumber}"]`);
-            if (cardElement) {
-                // Remove any existing focus
-                document.querySelectorAll('.card-container').forEach(card => {
-                    card.classList.remove('focused');
-                });
-                
-                // Scroll to card
-                cardElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                
-                // Add focus animation after scroll
-                setTimeout(() => {
-                    cardElement.classList.add('focused');
-                }, 800);
-            }
-        }
+       function scrollToCard(cardNumber) {
+    const cardElement = document.querySelector(`[data-card="${cardNumber}"]`);
+    if (cardElement) {
+        // Remove any existing focus
+        document.querySelectorAll('.card-container').forEach(card => {
+            card.classList.remove('focused');
+        });
+        
+        // Scroll to card
+        cardElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        
+        // Add focus animation after shorter delay
+        setTimeout(() => {
+            cardElement.classList.add('focused');
+        }, 400); // Reduced from 800ms to 400ms
+    }
+}
 
         const enneagramData = [
             {
