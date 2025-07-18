@@ -556,17 +556,16 @@
     <script>
         // Simple, smooth navigation function
 function scrollToCard(cardNumber) {
-    console.log('scrollToCard called with:', cardNumber); // Debug log
+    console.log('scrollToCard called with:', cardNumber);
     
     const cardElement = document.querySelector(`[data-card="${cardNumber}"]`);
-    console.log('Found card element:', cardElement); // Debug log
+    console.log('Found card element:', cardElement);
     
     if (!cardElement) {
         console.error('Card element not found for:', cardNumber);
         return;
     }
     
-    // Prevent multiple simultaneous scroll operations
     if (window.isScrolling) {
         console.log('Already scrolling, ignoring request');
         return;
@@ -574,16 +573,13 @@ function scrollToCard(cardNumber) {
     
     window.isScrolling = true;
     
-    // Remove any existing focus
     document.querySelectorAll('.card-container').forEach(card => {
         card.classList.remove('focused');
     });
     
-    // Detect mobile/touch devices
     const isMobile = window.innerWidth <= 768 || 'ontouchstart' in window;
     
     if (isMobile) {
-        // Use browser smooth scroll on mobile (it's optimized)
         cardElement.scrollIntoView({ 
             behavior: 'smooth', 
             block: 'start' 
@@ -591,16 +587,15 @@ function scrollToCard(cardNumber) {
         
         setTimeout(() => {
             cardElement.classList.add('focused');
-            window.isScrolling = false; // Reset flag
+            window.isScrolling = false;
         }, 800);
     } else {
-        // Use custom scroll on desktop to avoid white flash
         const targetPosition = cardElement.offsetTop - 120;
         const startPosition = window.pageYOffset;
         const distance = targetPosition - startPosition;
         const duration = Math.min(Math.abs(distance) * 0.4, 800);
         
-        console.log('Scroll details:', { targetPosition, startPosition, distance, duration }); // Debug log
+        console.log('Scroll details:', { targetPosition, startPosition, distance, duration });
         
         let start = null;
         
@@ -608,7 +603,6 @@ function scrollToCard(cardNumber) {
             if (!start) start = timestamp;
             const progress = Math.min((timestamp - start) / duration, 1);
             
-            // Smoother easing
             const ease = progress * (2 - progress);
             const currentPosition = startPosition + (distance * ease);
             
@@ -619,14 +613,14 @@ function scrollToCard(cardNumber) {
             } else {
                 setTimeout(() => {
                     cardElement.classList.add('focused');
-                    window.isScrolling = false; // Reset flag
+                    window.isScrolling = false;
                 }, 100);
             }
         }
         
         requestAnimationFrame(smoothScrollStep);
-        }
     }
+}
         const enneagramData = [
             {
                 type: "Type 1—The Strict Perfectionist",
