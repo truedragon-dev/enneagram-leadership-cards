@@ -527,18 +527,18 @@
     <div class="container">
         <!-- Navigation Header -->
         <div class="navigation">
-            <div class="nav-buttons">
-                <button class="nav-button" data-type="1" onclick="scrollToCard(1)">1</button>
-                <button class="nav-button" data-type="2" onclick="scrollToCard(2)">2</button>
-                <button class="nav-button" data-type="3" onclick="scrollToCard(3)">3</button>
-                <button class="nav-button" data-type="4" onclick="scrollToCard(4)">4</button>
-                <button class="nav-button" data-type="5" onclick="scrollToCard(5)">5</button>
-                <button class="nav-button" data-type="6" onclick="scrollToCard(6)">6</button>
-                <button class="nav-button" data-type="7" onclick="scrollToCard(7)">7</button>
-                <button class="nav-button" data-type="8" onclick="scrollToCard(8)">8</button>
-                <button class="nav-button" data-type="9" onclick="scrollToCard(9)">9</button>
-                <button class="nav-button experiment" onclick="scrollToCard('experiment')">⚡</button>
-            </div>
+           <div class="nav-buttons">
+    <button class="nav-button" data-type="1" onclick="event.stopPropagation(); scrollToCard(1)">1</button>
+    <button class="nav-button" data-type="2" onclick="event.stopPropagation(); scrollToCard(2)">2</button>
+    <button class="nav-button" data-type="3" onclick="event.stopPropagation(); scrollToCard(3)">3</button>
+    <button class="nav-button" data-type="4" onclick="event.stopPropagation(); scrollToCard(4)">4</button>
+    <button class="nav-button" data-type="5" onclick="event.stopPropagation(); scrollToCard(5)">5</button>
+    <button class="nav-button" data-type="6" onclick="event.stopPropagation(); scrollToCard(6)">6</button>
+    <button class="nav-button" data-type="7" onclick="event.stopPropagation(); scrollToCard(7)">7</button>
+    <button class="nav-button" data-type="8" onclick="event.stopPropagation(); scrollToCard(8)">8</button>
+    <button class="nav-button" data-type="9" onclick="event.stopPropagation(); scrollToCard(9)">9</button>
+    <button class="nav-button experiment" onclick="event.stopPropagation(); scrollToCard('experiment')">⚡</button>
+</div>
         </div>
 
         <h1>Enneagram Leadership Cards</h1>
@@ -556,7 +556,6 @@
     <script>
         // Simple, smooth navigation function
 function scrollToCard(cardNumber) {
-     if (event) event.stopPropagation();
     console.log('scrollToCard called with:', cardNumber); // Debug log
     
     const cardElement = document.querySelector(`[data-card="${cardNumber}"]`);
