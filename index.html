@@ -494,42 +494,52 @@
         .type-8 .field-question { border-left-color: #a63446; }
         .type-9 .field-question { border-left-color: #b8956a; }
 
-        @media (max-width: 768px) {
-            .container {
-                padding: 20px;
-            }
-            
-            .navigation {
-                margin: -20px -20px 20px -20px;
-            }
-            
-            .nav-buttons {
-                gap: 6px;
-                padding: 0 10px;
-            }
-            
-            .nav-button {
-                padding: 8px 12px;
-                font-size: 13px;
-            }
-            
-            .nav-button.experiment {
-                padding: 8px 10px;
-            }
-            
-            .grid {
-                grid-template-columns: 1fr;
-            }
-            
-            h1 {
-                font-size: 2em;
-            }
-            
-            .card-container {
-                height: 850px;
-                scroll-margin-top: 80px;
-            }
-        }
+       @media (max-width: 768px) {
+    .container {
+        padding: 20px;
+    }
+
+    .navigation {
+        margin: -20px -20px 20px -20px;
+    }
+
+    .nav-buttons {
+        gap: 6px;
+        padding: 0 10px;
+    }
+
+    .nav-button {
+        padding: 8px 12px;
+        font-size: 13px;
+    }
+
+    .nav-button.experiment {
+        padding: 8px 10px;
+    }
+
+    .grid {
+        grid-template-columns: 1fr;
+    }
+
+    h1 {
+        font-size: 2em;
+    }
+
+    .card-container {
+        height: auto !important;
+        min-height: 750px;
+        scroll-margin-top: 80px;
+    }
+
+    .card-face {
+        /* 👇 Performance-optimized visual style */
+        filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.08));
+        box-shadow: none !important;
+        border-radius: 0 !important;
+        background: #ffffff !important;
+        will-change: transform;
+    }
+}
     </style>
 </head>
 <body>
