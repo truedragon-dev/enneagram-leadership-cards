@@ -573,30 +573,34 @@
     </div>
 
     <script>
-        // iOS-optimized scroll function - v25 fix
         function scrollToCard(cardNumber) {
-            const cardElement = document.querySelector(`[data-card="${cardNumber}"]`);
-            if (!cardElement) {
-                console.error('Card element not found for:', cardNumber);
-                return;
-            }
-            
-            // Remove focus from all cards
-            document.querySelectorAll('.card-container').forEach(card => {
-                card.classList.remove('focused');
-            });
-            
-            // Use native scrollIntoView for iOS compatibility
-            cardElement.scrollIntoView({
-                behavior: 'smooth',
-                block: 'start'
-            });
-            
-            // Add focus animation after scroll completes
-            setTimeout(() => {
-                cardElement.classList.add('focused');
-            }, 600);
-        }
+  const cardElement = document.querySelector(`[data-card="${cardNumber}"]`);
+  if (!cardElement) {
+    console.error('Card element not found for:', cardNumber);
+    return;
+  }
+
+  // Clear previous focus styles
+  document.querySelectorAll('.card-container').forEach(card => {
+    card.classList.remove('focused');
+  });
+
+  // Scroll manually to avoid iOS freeze
+  const yOffset = -20;
+  const y = cardElement.getBoundingClientRect().top + window.pageYOffset + yOffset;
+
+  window.scrollTo({
+    top: y,
+    behavior: 'auto' // stays snappy
+  });
+
+  // Defer focus animation *after* scroll completes
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      cardElement.classList.add('focused');
+    });
+  });
+}
 
        const enneagramData = [
             {
