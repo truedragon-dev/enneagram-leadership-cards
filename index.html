@@ -580,26 +580,21 @@
     return;
   }
 
-  // Clear previous focus styles
+  // Remove previously focused states
   document.querySelectorAll('.card-container').forEach(card => {
     card.classList.remove('focused');
   });
 
-  // Scroll manually to avoid iOS freeze
-  const yOffset = -20;
-  const y = cardElement.getBoundingClientRect().top + window.pageYOffset + yOffset;
-
-  window.scrollTo({
-    top: y,
-    behavior: 'auto' // stays snappy
+  // Force Safari to scroll first without anything blocking it
+  cardElement.scrollIntoView({
+    behavior: 'auto',
+    block: 'start'
   });
 
-  // Defer focus animation *after* scroll completes
-  requestAnimationFrame(() => {
-    requestAnimationFrame(() => {
-      cardElement.classList.add('focused');
-    });
-  });
+  // Defer the animation class slightly — but just enough
+  setTimeout(() => {
+    cardElement.classList.add('focused');
+  }, 50); // 50–100ms seems to avoid freeze without adding lag
 }
 
        const enneagramData = [
