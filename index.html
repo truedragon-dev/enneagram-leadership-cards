@@ -176,11 +176,6 @@
             background: linear-gradient(135deg, #f7fafc 0%, #edf2f7 100%);
         }
 
-        .card-back {
-            transform: rotateY(180deg);
-            background: linear-gradient(135deg, #f7fafc 0%, #edf2f7 100%);
-        }
-
         .type-header {
             display: flex;
             align-items: center;
@@ -236,14 +231,13 @@
             text-align: center;
         }
 
- .attribution {
+        .attribution {
             margin-top: auto;
             margin-bottom: 40px;
             font-size: 0.75em;
             color: #9ca3af;
             font-style: italic;
         }
-
 
         .flip-indicator {
             position: absolute;
@@ -719,7 +713,7 @@
         // Initialize cards
         renderCards();
 
-        // Complete Enneagram Card Analytics Tracking
+        // Analytics tracking setup
         let cardSession = {
           startTime: Date.now(),
           totalFlips: 0,
@@ -733,6 +727,7 @@
         let cardEngagementTimes = new Map();
         let currentlyViewedCards = new Map();
         let viewObserver;
+        let inactivityTimer;
 
         function trackCardFlip(enneagramType, newSide) {
           cardSession.totalFlips++;
@@ -869,6 +864,12 @@
           }
         }
 
+        function resetInactivityTimer() {
+          clearTimeout(inactivityTimer);
+          inactivityTimer = setTimeout(trackSessionSummary, 30000);
+        }
+
+        // Event listeners
         window.addEventListener('beforeunload', function() {
           currentlyViewedCards.forEach((startTime, enneagramType) => {
             const timeSpent = Math.round((Date.now() - startTime) / 1000);
@@ -887,12 +888,6 @@
           
           trackSessionSummary();
         });
-
-        let inactivityTimer;
-        function resetInactivityTimer() {
-          clearTimeout(inactivityTimer);
-          inactivityTimer = setTimeout(trackSessionSummary, 30000);
-        }
 
         document.addEventListener('click', resetInactivityTimer);
         document.addEventListener('keypress', resetInactivityTimer);
@@ -913,140 +908,8 @@
             }, 50);
           }
         });
-function trackCardFlip(enneagramType, newSide) {
-          cardSession.totalFlips++;
-          cardSession.typesViewed.add(enneagramType);
-          cardSession.lastFlipTime = Date.now();
-          
-          if (newSide === 'individual') {
-            cardSession.individualViews++;
-          } else if (newSide === 'team') {
-            cardSession.teamViews++;
-          }
-          
-          gtag('event', 'card_flip', {
-            'event_category': 'card_interaction',
-            'event_label': `type_${enneagramType}_to_${newSide}`,
-            'enneagram_type': enneagramType,
-            'side_shown': newSide,
-            'total_flips': cardSession.totalFlips,
-            'session_duration': Math.round((Date.now() - cardSession.startTime) / 1000)
-          });
-          
-          gtag('event', `type_${enneagramType}_flip_to_${newSide}`, {
-            'event_category': 'specific_flips',
-            'enneagram_type': enneagramType,
-            'side_shown': newSide
-          });
-          
-          gtag('event', 'type_viewed', {
-            'event_category': 'card_interaction',
-            'event_label': `type_${enneagramType}`,
-            'custom_parameter_1': enneagramType,
-            'unique_types_in_session': cardSession.typesViewed.size
-          });
-          
-          gtag('event', `type_${enneagramType}_viewed`, {
-            'event_category': 'type_popularity',
-            'enneagram_type': enneagramType,
-            'side_shown': newSide
-          });
-        }
 
-        function trackCardView(card) {
-          const typeMatch = card.className.match(/type-(\d+)/);
-          const enneagramType = typeMatch ? typeMatch[1] : 'experiment';
-          
-          currentlyViewedCards.set(enneagramType, Date.now());
-          
-          if (!viewedCards.has(enneagramType)) {
-            viewedCards.add(enneagramType);
-            
-            gtag('event', 'card_viewed', {
-              'event_category': 'card_exposure',
-              'event_label': `type_${enneagramType}_viewed`,
-              'enneagram_type': enneagramType,
-              'side_shown': 'individual',
-              'view_method': 'scroll'
-            });
-            
-            gtag('event', `type_${enneagramType}_viewed_scroll`, {
-              'event_category': 'card_exposure',
-              'enneagram_type': enneagramType
-            });
-          }
-        }
-
-        function trackCardExit(card) {
-          const typeMatch = card.className.match(/type-(\d+)/);
-          const enneagramType = typeMatch ? typeMatch[1] : 'experiment';
-          
-          if (currentlyViewedCards.has(enneagramType)) {
-            const startTime = currentlyViewedCards.get(enneagramType);
-            const timeSpent = Math.round((Date.now() - startTime) / 1000);
-            
-            if (timeSpent >= 2) {
-              const existingTime = cardEngagementTimes.get(enneagramType) || 0;
-              cardEngagementTimes.set(enneagramType, existingTime + timeSpent);
-              
-              gtag('event', 'card_engagement_time', {
-                'event_category': 'card_engagement',
-                'event_label': `type_${enneagramType}_${timeSpent}s`,
-                'enneagram_type': enneagramType,
-                'engagement_seconds': timeSpent,
-                'total_card_time': cardEngagementTimes.get(enneagramType)
-              });
-              
-              let timeBucket;
-              if (timeSpent < 10) timeBucket = 'quick_scan';
-              else if (timeSpent < 30) timeBucket = 'moderate_read';
-              else if (timeSpent < 60) timeBucket = 'deep_read';
-              else timeBucket = 'extended_study';
-              
-              gtag('event', `type_${enneagramType}_${timeBucket}`, {
-                'event_category': 'engagement_depth',
-                'engagement_seconds': timeSpent,
-                'time_bucket': timeBucket
-              });
-            }
-            
-            currentlyViewedCards.delete(enneagramType);
-          }
-        }
-
-        function trackSessionSummary() {
-          const sessionDuration = Math.round((cardSession.lastFlipTime - cardSession.startTime) / 1000);
-          const preferredSide = cardSession.individualViews > cardSession.teamViews ? 'individual' : 'team';
-          
-          gtag('event', 'session_summary', {
-            'session_duration': sessionDuration,
-            'total_flips': cardSession.totalFlips,
-            'unique_types': cardSession.typesViewed.size,
-            'preferred_side': preferredSide,
-            'individual_views': cardSession.individualViews,
-            'team_views': cardSession.teamViews
-          });
-        }
-
-        function setupViewTracking() {
-          if ('IntersectionObserver' in window) {
-            viewObserver = new IntersectionObserver((entries) => {
-              entries.forEach(entry => {
-                if (entry.isIntersecting && entry.intersectionRatio > 0.5) {
-                  trackCardView(entry.target);
-                } else if (!entry.isIntersecting && currentlyViewedCards.has(entry.target.className.match(/type-(\d+)/)?.[1] || 'experiment')) {
-                  trackCardExit(entry.target);
-                }
-              });
-            }, {
-              threshold: [0, 0.5]
-            });
-            
-            document.querySelectorAll('.card').forEach(card => {
-              viewObserver.observe(card);
-            });
-          }
-        }
+        // Initial page load tracking
         gtag('event', 'page_load', {
           'page_title': document.title,
           'page_location': window.location.href
