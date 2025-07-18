@@ -90,6 +90,7 @@
 
         html {
             scroll-behavior: smooth;
+            background: #667eea;
         }
 
         body {
@@ -98,6 +99,7 @@
             min-height: 100vh;
             padding: 20px;
             color: #333;
+            background-attachment: fixed;
         }
 
         .container {
@@ -107,6 +109,8 @@
             border-radius: 20px;
             padding: 40px;
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            will-change: transform;
+            transform: translateZ(0)
         }
 
         /* Navigation Styles */
