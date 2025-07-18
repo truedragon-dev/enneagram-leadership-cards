@@ -25,55 +25,70 @@
 
     <!-- PWA Service Worker Registration -->
     <script>
-    // Detect Chrome on iOS specifically (not Android)
-    const isChromeIOS = /CriOS/.test(navigator.userAgent) && /iPhone|iPad/.test(navigator.userAgent);
+    // Force navigation visibility on mobile devices (especially Chrome iOS)
+    const isMobile = window.innerWidth <= 768 || /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
     
-    if (isChromeIOS) {
-        console.log('Chrome iOS detected - applying fallback styles');
-        // Add Chrome iOS specific styles
-        const chromeStyles = document.createElement('style');
-        chromeStyles.textContent = `
+    if (isMobile) {
+        console.log('Mobile device detected - applying navigation fix');
+        // Create mobile nav styles that override everything
+        const mobileNavStyles = document.createElement('style');
+        mobileNavStyles.id = 'mobile-nav-override';
+        mobileNavStyles.textContent = `
             @media (max-width: 768px) {
                 .navigation {
-                    position: absolute !important;
+                    position: fixed !important;
                     top: 0 !important;
                     left: 0 !important;
                     right: 0 !important;
-                    width: 100vw !important;
+                    width: 100% !important;
                     margin: 0 !important;
-                    background: #ffffff !important;
-                    border: 2px solid #667eea !important;
+                    background: rgba(255, 255, 255, 0.98) !important;
                     z-index: 999 !important;
+                    display: block !important;
+                    visibility: visible !important;
+                    opacity: 1 !important;
+                    border-radius: 0 !important;
+                    backdrop-filter: none !important;
+                    -webkit-backdrop-filter: none !important;
+                }
+                
+                body {
+                    padding-top: 70px !important;
                 }
                 
                 .container {
-                    margin-top: 80px !important;
-                    position: relative !important;
+                    margin-top: 10px !important;
                 }
                 
                 .nav-buttons {
                     display: flex !important;
-                    flex-wrap: wrap !important;
                     justify-content: center !important;
-                    padding: 10px !important;
-                    background: #ffffff !important;
+                    flex-wrap: wrap !important;
+                    gap: 6px !important;
+                    padding: 8px 10px !important;
                 }
                 
                 .nav-button {
-                    display: inline-block !important;
+                    display: inline-flex !important;
+                    align-items: center !important;
+                    justify-content: center !important;
                     visibility: visible !important;
                     opacity: 1 !important;
-                    background: #667eea !important;
-                    color: white !important;
-                    border: 1px solid #333 !important;
-                    padding: 12px 15px !important;
-                    margin: 3px !important;
+                    padding: 10px 12px !important;
+                    font-size: 14px !important;
+                    min-width: 38px !important;
+                    min-height: 38px !important;
+                    border-radius: 19px !important;
+                }
+                
+                .nav-button.experiment {
+                    padding: 8px 10px !important;
+                    min-width: 42px !important;
                     font-size: 16px !important;
-                    border-radius: 8px !important;
                 }
             }
         `;
-        document.head.appendChild(chromeStyles);
+        document.head.appendChild(mobileNavStyles);
     }
 
     if ('serviceWorker' in navigator) {
@@ -172,19 +187,11 @@
             top: 0;
             background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
             padding: 20px 0;
             margin: -40px -40px 30px -40px;
             border-radius: 20px 20px 0 0;
             z-index: 100;
             border-bottom: 1px solid rgba(102, 126, 234, 0.2);
-        }
-        
-        /* Fallback for browsers that don't support backdrop-filter */
-        @supports not (backdrop-filter: blur(10px)) {
-            .navigation {
-                background: rgba(255, 255, 255, 0.98);
-            }
         }
 
         .nav-buttons {
@@ -388,7 +395,7 @@
             font-size: 0.75em;
             color: #9ca3af;
             font-style: italic;
-            padding-bottom: 50px;
+            padding-bottom: 15px;
         }
 
         .flip-indicator {
@@ -397,7 +404,8 @@
             background: rgba(255, 255, 255, 0.8);
             padding: 5px 10px;
             border-radius: 15px;
-            margin: 15px 0 10px 0;
+            text-align: center;
+            margin-bottom: 10px;
         }
 
         .core-drive { color: #e53e3e; }
@@ -548,68 +556,38 @@
 
         @media (max-width: 768px) {
             .container {
-                padding: 15px;
-                border-radius: 15px;
-                margin-top: 70px;
+                padding: 20px;
             }
             
             .navigation {
-                margin: 0;
-                padding: 12px 0;
-                position: fixed !important;
-                top: 0;
-                left: 0;
-                right: 0;
-                width: 100%;
-                background: rgba(255, 255, 255, 0.98);
-                backdrop-filter: none;
-                -webkit-backdrop-filter: none;
-                border-radius: 0;
-                z-index: 101;
-                box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+                margin: -20px -20px 20px -20px;
             }
             
             .nav-buttons {
                 gap: 6px;
-                padding: 0 12px;
-                justify-content: center;
-                flex-wrap: wrap;
-                display: flex;
+                padding: 0 10px;
             }
             
             .nav-button {
-                padding: 10px 12px;
-                font-size: 14px;
-                min-width: 38px;
-                min-height: 38px;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                border-radius: 19px;
-                -webkit-tap-highlight-color: transparent;
+                padding: 8px 12px;
+                font-size: 13px;
             }
             
             .nav-button.experiment {
                 padding: 8px 10px;
-                min-width: 42px;
-                min-height: 38px;
-                font-size: 16px;
             }
             
             .grid {
                 grid-template-columns: 1fr;
-                margin-top: 20px;
             }
             
             h1 {
                 font-size: 2em;
-                margin-top: 5px;
-                margin-bottom: 8px;
             }
             
             .card-container {
                 height: 850px;
-                scroll-margin-top: 90px;
+                scroll-margin-top: 80px;
             }
         }
     </style>
@@ -683,18 +661,12 @@
             const isMobile = window.innerWidth <= 768 || 'ontouchstart' in window;
             
             if (isMobile) {
-                // Simple, slower scroll for mobile
-                const targetPosition = cardElement.offsetTop - 100;
-                const startPosition = window.pageYOffset;
-                const scrollDistance = targetPosition - startPosition;
-                
-                // Use browser's smooth scroll but with slower timing
+                // Simple mobile scroll
                 cardElement.scrollIntoView({ 
                     behavior: 'smooth', 
                     block: 'start'
                 });
                 
-                // Add focus after scroll completes
                 setTimeout(() => {
                     if (window.lastScrollTarget === cardNumber) {
                         cardElement.classList.add('focused');
@@ -702,7 +674,7 @@
                     window.isScrolling = false;
                 }, 1000);
             } else {
-                // Desktop smooth scroll (unchanged)
+                // Desktop smooth scroll
                 const targetPosition = cardElement.offsetTop - 120;
                 const startPosition = window.pageYOffset;
                 const scrollDistance = targetPosition - startPosition;
