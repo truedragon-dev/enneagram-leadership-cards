@@ -105,6 +105,50 @@
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
         }
 
+        /* Navigation Styles */
+        .navigation {
+            position: sticky;
+            top: 0;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 20px 0;
+            margin: -40px -40px 30px -40px;
+            border-radius: 20px 20px 0 0;
+            z-index: 100;
+            border-bottom: 1px solid rgba(102, 126, 234, 0.2);
+        }
+
+        .nav-buttons {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 8px;
+            padding: 0 20px;
+        }
+
+        .nav-button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 10px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .nav-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .nav-button.experiment {
+            background: linear-gradient(135deg, #9f7aea 0%, #553c9a 100%);
+            padding: 10px 12px;
+        }
+
         h1 {
             text-align: center;
             font-size: 2.5em;
@@ -138,9 +182,10 @@
             margin-top: 30px;
         }
 
-         .card-container {
+        .card-container {
             perspective: 1000px;
             height: 950px;
+            scroll-margin-top: 100px; /* Offset for sticky navigation */
         }
 
         .card {
@@ -396,9 +441,27 @@
         .type-8 .field-question { border-left-color: #a63446; }
         .type-9 .field-question { border-left-color: #b8956a; }
 
-         @media (max-width: 768px) {
+        @media (max-width: 768px) {
             .container {
                 padding: 20px;
+            }
+            
+            .navigation {
+                margin: -20px -20px 20px -20px;
+            }
+            
+            .nav-buttons {
+                gap: 6px;
+                padding: 0 10px;
+            }
+            
+            .nav-button {
+                padding: 8px 12px;
+                font-size: 13px;
+            }
+            
+            .nav-button.experiment {
+                padding: 8px 10px;
             }
             
             .grid {
@@ -411,12 +474,29 @@
             
             .card-container {
                 height: 850px;
+                scroll-margin-top: 80px;
             }
         }
     </style>
 </head>
 <body>
     <div class="container">
+        <!-- Navigation Header -->
+        <div class="navigation">
+            <div class="nav-buttons">
+                <button class="nav-button" onclick="scrollToCard(1)">1</button>
+                <button class="nav-button" onclick="scrollToCard(2)">2</button>
+                <button class="nav-button" onclick="scrollToCard(3)">3</button>
+                <button class="nav-button" onclick="scrollToCard(4)">4</button>
+                <button class="nav-button" onclick="scrollToCard(5)">5</button>
+                <button class="nav-button" onclick="scrollToCard(6)">6</button>
+                <button class="nav-button" onclick="scrollToCard(7)">7</button>
+                <button class="nav-button" onclick="scrollToCard(8)">8</button>
+                <button class="nav-button" onclick="scrollToCard(9)">9</button>
+                <button class="nav-button experiment" onclick="scrollToCard('experiment')">⚡</button>
+            </div>
+        </div>
+
         <h1>Enneagram Leadership Cards</h1>
         <p class="subtitle">Individual Awareness & Higher Team IQ</p>
         <div class="instructions">
@@ -430,152 +510,160 @@
     </div>
 
     <script>
-      const enneagramData = [
-    {
-        type: "Type 1—The Strict Perfectionist",
-        number: "1",
-        coreDrive: "Driven to do what's right and improve the world while avoiding mistakes, blame, or being seen as corrupt or defective.",
-        leadsThrough: "Integrity, responsibility, attention to detail, organization, and pragmatism",
-        interactionStyle: "Principled, firm, composed. Leads with structure and standards. Can become rigid under chaos or inefficiency.",
-        shadowWatch: "When I'm in shadow, I can create a field where others feel like they're walking on eggshells, anticipating criticism and judgment. This happens even when I think I'm being helpful by pointing out what needs to be fixed.",
-        growthEdge: "Act on what's good enough before you know it's right, and stay with it long enough to discover that effectiveness can emerge from iteration, not just perfection.",
-        fieldQuestions: [
-            "What's working well that we should protect and build on?",
-            "Where is perfectionism blocking our progress?",
-            "What standards are serving us vs. limiting us right now?",
-            "Are we focusing on being right or being effective?"
-        ]
-    },
-    {
-        type: "Type 2—The Considerate Helper",
-        number: "2",
-        coreDrive: "Seeks love and connection by meeting others' needs while avoiding rejection, being seen as inadequate, or feeling unneeded.",
-        leadsThrough: "Motivation, relationships, supportiveness, and resourcefulness",
-        interactionStyle: "Warm, attentive, relationally attuned. Prioritizes others' needs and rapport. May over-accommodate or avoid direct asks.",
-        shadowWatch: "When I'm in shadow, I can make others feel guilty for having needs I can't meet or for not appreciating my efforts enough. This happens even when I think I'm being selflessly supportive.",
-        growthEdge: "Ask directly for what you need before ensuring others are taken care of, and stay with it long enough to discover that others can stay connected even when you prioritize yourself.",
-        fieldQuestions: [
-            "Who's not being heard or cared for right now?",
-            "What does the emotional field need from us?",
-            "Are we attending to relationships while pursuing our goals?",
-            "Who might be giving too much and needs support?"
-        ]
-    },
-    {
-        type: "Type 3—The Competitive Achiever",
-        number: "3",
-        coreDrive: "Pursues achievement and recognition to feel valued while avoiding failure, inefficiency, or being seen as unsuccessful or unworthy.",
-        leadsThrough: "Focus, clear goals, entrepreneurial spirit, and can-do energy",
-        interactionStyle: "Polished, focused, efficient. Orients to goals and recognition. Can bypass emotional nuance in pursuit of performance.",
-        shadowWatch: "When I'm in shadow, I can create a pace that others can't sustain and make process feel less important than results. This happens even when I think I'm being appropriately focused and efficient.",
-        growthEdge: "Show up authentically messy before you feel polished enough, and stay with it long enough to discover that people can value your realness more than your performance.",
-        fieldQuestions: [
-            "Are we optimizing for real impact or just looking successful?",
-            "What's the right pace for sustainable progress?",
-            "Are we including all voices in our drive toward goals?",
-            "What are we sacrificing in our pursuit of achievement?"
-        ]
-    },
-    {
-        type: "Type 4—The Intense Creative",
-        number: "4",
-        coreDrive: "Strives for authenticity and emotional depth while avoiding being misunderstood, mundane, or emotionally insignificant.",
-        leadsThrough: "Vision, creativity, compassion, and emotional depth",
-        interactionStyle: "Expressive, introspective, emotionally honest. Seeks depth and resonance. May withdraw if authenticity feels threatened.",
-        shadowWatch: "When I'm in shadow, I can create a field where others feel they can't be authentic enough or that their concerns are too ordinary. This happens even when I think I'm championing depth and meaning.",
-        growthEdge: "Share what's ordinary and commonplace about your experience, and stay with it long enough to discover that connection can happen through shared humanity, not just specialness.",
-        fieldQuestions: [
-            "What's missing from our conversation that needs to be named?",
-            "Are we being authentic or just going through the motions?",
-            "What deeper purpose are we serving beyond the task?",
-            "Who might be feeling unseen or misunderstood?"
-        ]
-    },
-    {
-        type: "Type 5—The Quiet Specialist",
-        number: "5",
-        coreDrive: "Seeks knowledge and clarity to maintain autonomy while avoiding intrusion, overwhelm, or appearing incompetent.",
-        leadsThrough: "Expertise, analysis, objectivity, planning, and logic",
-        interactionStyle: "Private, precise, observing. Engages from a distance. Shares selectively and prefers mental clarity over emotional messiness.",
-        shadowWatch: "When I'm in shadow, I can withhold information and process, leaving others to fill in gaps with assumptions. This happens even when I think I'm being thorough and protecting the quality of my thinking.",
-        growthEdge: "Share your thinking process before it's complete, and stay with it long enough to discover that others' input can enhance rather than contaminate your insights.",
-        fieldQuestions: [
-            "What information is the team missing that I might have?",
-            "Are we making decisions with enough data and analysis?",
-            "What am I observing that others might not be seeing?",
-            "Where do we need more time to think before acting?"
-        ]
-    },
-    {
-        type: "Type 6—The Loyal Skeptic",
-        number: "6",
-        coreDrive: "Wants security and trust through loyalty and vigilance while avoiding uncertainty, blame, or being caught off guard.",
-        leadsThrough: "Risk assessment, perseverance, collaboration, and foresight",
-        interactionStyle: "Vigilant, loyal, questioning. Builds safety through inquiry and preparedness. Can oscillate between caution and pushback.",
-        shadowWatch: "When I'm in shadow, I can create an atmosphere where others feel questioned, doubted, or that nothing is ever safe enough. This happens even when I think I'm being appropriately cautious and thorough.",
-        growthEdge: "Act on your instinct before you have all the guarantees, and stay with it long enough to discover that security can come from trusting your inner knowing, not just external certainty.",
-        fieldQuestions: [
-            "What risks are we not seeing or preparing for?",
-            "Do we have enough support and backup plans?",
-            "Who's not fully committed and why?",
-            "Are we moving too fast without considering consequences?"
-        ]
-    },
-    {
-        type: "Type 7—The Enthusiastic Visionary",
-        number: "7",
-        coreDrive: "Pursues freedom, joy, and new possibilities while avoiding limitation, pain, or feeling trapped in discomfort.",
-        leadsThrough: "Innovation, curiosity, energy, idea generation, and optimism",
-        interactionStyle: "Upbeat, scattered, future-focused. Brings energy and ideas. May avoid hard emotions or prematurely pivot from discomfort.",
-        shadowWatch: "When I'm in shadow, I can create a field where difficult emotions or problems get dismissed or glossed over too quickly. This happens even when I think I'm maintaining positive energy and forward momentum.",
-        growthEdge: "Stay with difficulty and constraint long enough to let it teach you, and discover that depth can emerge from limitation, not just from endless options.",
-        fieldQuestions: [
-            "What possibilities are we not seeing or exploring?",
-            "Are we avoiding something difficult that needs attention?",
-            "Is our energy sustainable or are we burning out?",
-            "What would inject more innovation or creativity here?"
-        ]
-    },
-    {
-        type: "Type 8—The Active Controller",
-        number: "8",
-        coreDrive: "Driven to assert control and protect what matters while avoiding vulnerability, weakness, or being controlled by others.",
-        leadsThrough: "Boldness, action, strategic influence, and candor",
-        interactionStyle: "Bold, direct, intense. Commands attention and moves quickly to action. Can overpower or challenge before building buy-in.",
-        shadowWatch: "When I'm in shadow, I can create a field where others feel steamrolled, unheard, or afraid to voice alternative perspectives. This happens even when I think I'm being appropriately direct and action-oriented.",
-        growthEdge: "Show your uncertainty and ask for help before you feel strong enough, and stay with it long enough to discover that vulnerability can increase rather than diminish your influence.",
-        fieldQuestions: [
-            "What are we avoiding that needs direct engagement?",
-            "Where is power not flowing effectively in our team?",
-            "Who might be holding back their truth or perspective?",
-            "Are we moving with appropriate force or overwhelming others?"
-        ]
-    },
-    {
-        type: "Type 9—The Adaptive Peacemaker",
-        number: "9",
-        coreDrive: "Seeks peace, harmony, and internal stability while avoiding conflict, tension, or the discomfort of their own priorities.",
-        leadsThrough: "Patience, consistency, diplomacy, and inclusion",
-        interactionStyle: "Open, agreeable, unhurried. Tends to merge with group flow. May resist direct conflict or suppress inner priorities.",
-        shadowWatch: "When I'm in shadow, I can create a vacuum where others have to carry all the tension and make the difficult decisions. This happens even when I think I'm being diplomatic and keeping the peace.",
-        growthEdge: "Speak into the conflict that others are avoiding and stay with it long enough to discover that engaging tension can create deeper harmony than always avoiding it.",
-        fieldQuestions: [
-            "What tensions are we not addressing that need attention?",
-            "Whose perspectives are missing from our conversation?",
-            "Are we including everyone or just avoiding conflict?",
-            "What would bring more genuine harmony vs. surface peace?"
-        ]
-    }
-];
+        // Navigation function
+        function scrollToCard(cardNumber) {
+            const cardElement = document.querySelector(`[data-card="${cardNumber}"]`);
+            if (cardElement) {
+                cardElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        }
+
+        const enneagramData = [
+            {
+                type: "Type 1—The Strict Perfectionist",
+                number: "1",
+                coreDrive: "Driven to do what's right and improve the world while avoiding mistakes, blame, or being seen as corrupt or defective.",
+                leadsThrough: "Integrity, responsibility, attention to detail, organization, and pragmatism",
+                interactionStyle: "Principled, firm, composed. Leads with structure and standards. Can become rigid under chaos or inefficiency.",
+                shadowWatch: "When I'm in shadow, I can create a field where others feel like they're walking on eggshells, anticipating criticism and judgment. This happens even when I think I'm being helpful by pointing out what needs to be fixed.",
+                growthEdge: "Act on what's good enough before you know it's right, and stay with it long enough to discover that effectiveness can emerge from iteration, not just perfection.",
+                fieldQuestions: [
+                    "What's working well that we should protect and build on?",
+                    "Where is perfectionism blocking our progress?",
+                    "What standards are serving us vs. limiting us right now?",
+                    "Are we focusing on being right or being effective?"
+                ]
+            },
+            {
+                type: "Type 2—The Considerate Helper",
+                number: "2",
+                coreDrive: "Seeks love and connection by meeting others' needs while avoiding rejection, being seen as inadequate, or feeling unneeded.",
+                leadsThrough: "Motivation, relationships, supportiveness, and resourcefulness",
+                interactionStyle: "Warm, attentive, relationally attuned. Prioritizes others' needs and rapport. May over-accommodate or avoid direct asks.",
+                shadowWatch: "When I'm in shadow, I can make others feel guilty for having needs I can't meet or for not appreciating my efforts enough. This happens even when I think I'm being selflessly supportive.",
+                growthEdge: "Ask directly for what you need before ensuring others are taken care of, and stay with it long enough to discover that others can stay connected even when you prioritize yourself.",
+                fieldQuestions: [
+                    "Who's not being heard or cared for right now?",
+                    "What does the emotional field need from us?",
+                    "Are we attending to relationships while pursuing our goals?",
+                    "Who might be giving too much and needs support?"
+                ]
+            },
+            {
+                type: "Type 3—The Competitive Achiever",
+                number: "3",
+                coreDrive: "Pursues achievement and recognition to feel valued while avoiding failure, inefficiency, or being seen as unsuccessful or unworthy.",
+                leadsThrough: "Focus, clear goals, entrepreneurial spirit, and can-do energy",
+                interactionStyle: "Polished, focused, efficient. Orients to goals and recognition. Can bypass emotional nuance in pursuit of performance.",
+                shadowWatch: "When I'm in shadow, I can create a pace that others can't sustain and make process feel less important than results. This happens even when I think I'm being appropriately focused and efficient.",
+                growthEdge: "Show up authentically messy before you feel polished enough, and stay with it long enough to discover that people can value your realness more than your performance.",
+                fieldQuestions: [
+                    "Are we optimizing for real impact or just looking successful?",
+                    "What's the right pace for sustainable progress?",
+                    "Are we including all voices in our drive toward goals?",
+                    "What are we sacrificing in our pursuit of achievement?"
+                ]
+            },
+            {
+                type: "Type 4—The Intense Creative",
+                number: "4",
+                coreDrive: "Strives for authenticity and emotional depth while avoiding being misunderstood, mundane, or emotionally insignificant.",
+                leadsThrough: "Vision, creativity, compassion, and emotional depth",
+                interactionStyle: "Expressive, introspective, emotionally honest. Seeks depth and resonance. May withdraw if authenticity feels threatened.",
+                shadowWatch: "When I'm in shadow, I can create a field where others feel they can't be authentic enough or that their concerns are too ordinary. This happens even when I think I'm championing depth and meaning.",
+                growthEdge: "Share what's ordinary and commonplace about your experience, and stay with it long enough to discover that connection can happen through shared humanity, not just specialness.",
+                fieldQuestions: [
+                    "What's missing from our conversation that needs to be named?",
+                    "Are we being authentic or just going through the motions?",
+                    "What deeper purpose are we serving beyond the task?",
+                    "Who might be feeling unseen or misunderstood?"
+                ]
+            },
+            {
+                type: "Type 5—The Quiet Specialist",
+                number: "5",
+                coreDrive: "Seeks knowledge and clarity to maintain autonomy while avoiding intrusion, overwhelm, or appearing incompetent.",
+                leadsThrough: "Expertise, analysis, objectivity, planning, and logic",
+                interactionStyle: "Private, precise, observing. Engages from a distance. Shares selectively and prefers mental clarity over emotional messiness.",
+                shadowWatch: "When I'm in shadow, I can withhold information and process, leaving others to fill in gaps with assumptions. This happens even when I think I'm being thorough and protecting the quality of my thinking.",
+                growthEdge: "Share your thinking process before it's complete, and stay with it long enough to discover that others' input can enhance rather than contaminate your insights.",
+                fieldQuestions: [
+                    "What information is the team missing that I might have?",
+                    "Are we making decisions with enough data and analysis?",
+                    "What am I observing that others might not be seeing?",
+                    "Where do we need more time to think before acting?"
+                ]
+            },
+            {
+                type: "Type 6—The Loyal Skeptic",
+                number: "6",
+                coreDrive: "Wants security and trust through loyalty and vigilance while avoiding uncertainty, blame, or being caught off guard.",
+                leadsThrough: "Risk assessment, perseverance, collaboration, and foresight",
+                interactionStyle: "Vigilant, loyal, questioning. Builds safety through inquiry and preparedness. Can oscillate between caution and pushback.",
+                shadowWatch: "When I'm in shadow, I can create an atmosphere where others feel questioned, doubted, or that nothing is ever safe enough. This happens even when I think I'm being appropriately cautious and thorough.",
+                growthEdge: "Act on your instinct before you have all the guarantees, and stay with it long enough to discover that security can come from trusting your inner knowing, not just external certainty.",
+                fieldQuestions: [
+                    "What risks are we not seeing or preparing for?",
+                    "Do we have enough support and backup plans?",
+                    "Who's not fully committed and why?",
+                    "Are we moving too fast without considering consequences?"
+                ]
+            },
+            {
+                type: "Type 7—The Enthusiastic Visionary",
+                number: "7",
+                coreDrive: "Pursues freedom, joy, and new possibilities while avoiding limitation, pain, or feeling trapped in discomfort.",
+                leadsThrough: "Innovation, curiosity, energy, idea generation, and optimism",
+                interactionStyle: "Upbeat, scattered, future-focused. Brings energy and ideas. May avoid hard emotions or prematurely pivot from discomfort.",
+                shadowWatch: "When I'm in shadow, I can create a field where difficult emotions or problems get dismissed or glossed over too quickly. This happens even when I think I'm maintaining positive energy and forward momentum.",
+                growthEdge: "Stay with difficulty and constraint long enough to let it teach you, and discover that depth can emerge from limitation, not just from endless options.",
+                fieldQuestions: [
+                    "What possibilities are we not seeing or exploring?",
+                    "Are we avoiding something difficult that needs attention?",
+                    "Is our energy sustainable or are we burning out?",
+                    "What would inject more innovation or creativity here?"
+                ]
+            },
+            {
+                type: "Type 8—The Active Controller",
+                number: "8",
+                coreDrive: "Driven to assert control and protect what matters while avoiding vulnerability, weakness, or being controlled by others.",
+                leadsThrough: "Boldness, action, strategic influence, and candor",
+                interactionStyle: "Bold, direct, intense. Commands attention and moves quickly to action. Can overpower or challenge before building buy-in.",
+                shadowWatch: "When I'm in shadow, I can create a field where others feel steamrolled, unheard, or afraid to voice alternative perspectives. This happens even when I think I'm being appropriately direct and action-oriented.",
+                growthEdge: "Show your uncertainty and ask for help before you feel strong enough, and stay with it long enough to discover that vulnerability can increase rather than diminish your influence.",
+                fieldQuestions: [
+                    "What are we avoiding that needs direct engagement?",
+                    "Where is power not flowing effectively in our team?",
+                    "Who might be holding back their truth or perspective?",
+                    "Are we moving with appropriate force or overwhelming others?"
+                ]
+            },
+            {
+                type: "Type 9—The Adaptive Peacemaker",
+                number: "9",
+                coreDrive: "Seeks peace, harmony, and internal stability while avoiding conflict, tension, or the discomfort of their own priorities.",
+                leadsThrough: "Patience, consistency, diplomacy, and inclusion",
+                interactionStyle: "Open, agreeable, unhurried. Tends to merge with group flow. May resist direct conflict or suppress inner priorities.",
+                shadowWatch: "When I'm in shadow, I can create a vacuum where others have to carry all the tension and make the difficult decisions. This happens even when I think I'm being diplomatic and keeping the peace.",
+                growthEdge: "Speak into the conflict that others are avoiding and stay with it long enough to discover that engaging tension can create deeper harmony than always avoiding it.",
+                fieldQuestions: [
+                    "What tensions are we not addressing that need attention?",
+                    "Whose perspectives are missing from our conversation?",
+                    "Are we including everyone or just avoiding conflict?",
+                    "What would bring more genuine harmony vs. surface peace?"
+                ]
+            }
+        ];
 
         function createCard(data) {
             return `
-                <div class="card-container">
+                <div class="card-container" data-card="${data.number}">
                     <div class="card type-${data.number}" onclick="flipCard(this)">
                         <div class="card-face type-${data.number}">
                             <div class="type-header">
                                 <div class="type-number">${data.number}</div>
-                                <div class="type-name">${data.type.replace(/Type \d+ — /, '')}</div>
+                                <div class="type-name">${data.type.replace(/Type \d+—/, '')}</div>
                             </div>
                             
                             <div class="section">
@@ -613,7 +701,7 @@
                         <div class="card-face card-back type-${data.number}">
                             <div class="type-header">
                                 <div class="type-number">${data.number}</div>
-                                <div class="type-name">${data.type.replace(/Type \d+ — /, '')}</div>
+                                <div class="type-name">${data.type.replace(/Type \d+—/, '')}</div>
                             </div>
                             
                             <div class="field-title">Questions for Higher Team IQ</div>
@@ -639,7 +727,7 @@
             
             // Add experiment card at the end
             const experimentCard = `
-                <div class="card-container">
+                <div class="card-container" data-card="experiment">
                     <div class="card experiment-card" onclick="flipCard(this)">
                         <div class="card-face experiment-card">
                             <div class="experiment-header">
