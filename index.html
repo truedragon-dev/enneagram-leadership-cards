@@ -557,13 +557,21 @@
             card.classList.remove('focused');
         });
         
+        // Calculate scroll distance for dynamic timing
+        const currentScroll = window.scrollY;
+        const targetScroll = cardElement.offsetTop - 100;
+        const scrollDistance = Math.abs(targetScroll - currentScroll);
+        
+        // Dynamic delay based on scroll distance
+        const animationDelay = Math.min(800, Math.max(200, scrollDistance / 2));
+        
         // Scroll to card
         cardElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
         
-        // Add focus animation after shorter delay
+        // Add focus animation after dynamic delay
         setTimeout(() => {
             cardElement.classList.add('focused');
-        }, 400); // Reduced from 800ms to 400ms
+        }, animationDelay);
     }
 }
 
