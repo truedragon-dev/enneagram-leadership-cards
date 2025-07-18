@@ -573,28 +573,28 @@
     </div>
 
     <script>
-        function scrollToCard(cardNumber) {
+       function scrollToCard(cardNumber) {
   const cardElement = document.querySelector(`[data-card="${cardNumber}"]`);
   if (!cardElement) {
     console.error('Card element not found for:', cardNumber);
     return;
   }
 
-  // Remove previously focused states
+  // Remove previously focused state
   document.querySelectorAll('.card-container').forEach(card => {
     card.classList.remove('focused');
   });
 
-  // Force Safari to scroll first without anything blocking it
+  // Smooth scroll to the card
   cardElement.scrollIntoView({
-    behavior: 'auto',
+    behavior: 'smooth',
     block: 'start'
   });
 
-  // Defer the animation class slightly — but just enough
+  // Wait long enough for iOS to finish scrolling cleanly before adding animation
   setTimeout(() => {
     cardElement.classList.add('focused');
-  }, 50); // 50–100ms seems to avoid freeze without adding lag
+  }, 600); // this delay avoids layout conflict during scroll
 }
 
        const enneagramData = [
