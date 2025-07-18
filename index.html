@@ -877,8 +877,9 @@
         }
 
         // Initialize cards
-        renderCards();
-
+     renderCards();
+setupViewTracking();
+setupScrollFlipReset();
         // Analytics tracking setup
         let cardSession = {
           startTime: Date.now(),
@@ -1117,6 +1118,78 @@ window.addEventListener('scroll', () => {
       scrollThrottle = null;
     }, 100); // adjust delay to control responsiveness
   }
+});
+        function isElementInViewport(el) {
+  const rect = el.getBoundingClientRect();
+  return (
+    rect.top >= 0 &&
+    rect.bottom <= (window.innerHeight || document.documentElement.clientHeight)
+  );
+}
+
+function flipBackVisibleCards() {
+  const flippedCards = document.querySelectorAll('.card.flipped');
+  if (flippedCards.length === 0) return; // ✅ Skip if no flipped cards
+
+  flippedCards.forEach(card => {
+    if (isElementInViewport(card)) {
+      card.classList.remove('flipped');
+    }
+  });
+}
+
+function setupScrollFlipReset() {
+  let scrollThrottle;
+  window.addEventListener('scroll', () => {
+    if (!scrollThrottle) {
+      scrollThrottle = setTimeout(() => {
+        flipBackVisibleCards();
+        scrollThrottle = null;
+      }, 100); // Throttle for performance
+    }
+  });
+}
+  window.onload = function () {
+  renderCards();
+  setupViewTracking();
+  setupScrollFlipReset();
+};
+        function isElementInViewport(el) {
+  const rect = el.getBoundingClientRect();
+  return (
+    rect.top >= 0 &&
+    rect.bottom <= (window.innerHeight || document.documentElement.clientHeight)
+  );
+}
+
+function flipBackVisibleCards() {
+  const flippedCards = document.querySelectorAll('.card.flipped');
+  if (flippedCards.length === 0) return;
+
+  flippedCards.forEach(card => {
+    if (isElementInViewport(card)) {
+      card.classList.remove('flipped');
+    }
+  });
+}
+
+function setupScrollFlipReset() {
+  let scrollThrottle;
+  window.addEventListener('scroll', () => {
+    if (!scrollThrottle) {
+      scrollThrottle = setTimeout(() => {
+        flipBackVisibleCards();
+        scrollThrottle = null;
+      }, 100);
+    }
+  });
+}
+
+// 👇 This runs *after* all DOM + cards are loaded
+window.addEventListener('load', () => {
+  renderCards();
+  setupViewTracking();
+  setupScrollFlipReset();
 });
     </script>
 </body>
