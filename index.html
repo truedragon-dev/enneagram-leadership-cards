@@ -1,5 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
+    {
+  scroll-behavior: auto; /* disable global smooth scroll */
+}
 <head>
     <!-- Google tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-5VFNX8QJB3"></script>
@@ -564,18 +567,28 @@ html {
     <script>
         // Navigation function with focus animation
 function scrollToCard(cardNumber) {
-  const cardElement = document.querySelector(`[data-card="${cardNumber}"]`);
-  if (cardElement) {
-    document.querySelectorAll('.card-container').forEach(card => {
-      card.classList.remove('focused');
-    });
+  const target = document.getElementById(`card-${cardNumber}`);
+  if (!target) return;
 
-    cardElement.scrollIntoView({ behavior: 'smooth' });
+  const container = document.querySelector('.container');
+
+  // Optional: Prevent spamming clicks during transition
+  container.style.pointerEvents = 'none';
+
+  // Fade out
+  container.style.transition = 'opacity 0.25s ease';
+  container.style.opacity = '0';
+
+  setTimeout(() => {
+    // Instant scroll jump
+    target.scrollIntoView({ behavior: 'auto', block: 'start' });
 
     setTimeout(() => {
-      cardElement.classList.add('focused');
-    }, 600);
-  }
+      // Fade back in
+      container.style.opacity = '1';
+      container.style.pointerEvents = 'auto';
+    }, 60); // Allow small buffer
+  }, 180); // Fade out duration
 }
         const enneagramData = [
             {
