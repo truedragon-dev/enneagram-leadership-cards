@@ -592,55 +592,41 @@ function scrollToCard(cardNumber) {
     
     const isMobile = window.innerWidth <= 768 || 'ontouchstart' in window;
     
-    if (isMobile) {
-        cardElement.scrollIntoView({ 
-            behavior: 'smooth', 
-            block: 'start' 
-        });
-        
+ / Use custom smooth scroll for both mobile and desktop
+const targetPosition = cardElement.offsetTop - (isMobile ? 80 : 120);
+const startPosition = window.pageYOffset;
+const scrollDistance = targetPosition - startPosition;
+const duration = Math.min(Math.abs(scrollDistance) * (isMobile ? 0.5 : 0.4), isMobile ? 1000 : 800);
+
+let start = null;
+
+function smoothScrollStep(timestamp) {
+    if (window.lastScrollTarget !== cardNumber) {
+        window.isScrolling = false;
+        return;
+    }
+    
+    if (!start) start = timestamp;
+    const progress = Math.min((timestamp - start) / duration, 1);
+    
+    const ease = progress * (2 - progress);
+    const currentPosition = startPosition + (scrollDistance * ease);
+    
+    window.scrollTo(0, currentPosition);
+    
+    if (progress < 1) {
+        requestAnimationFrame(smoothScrollStep);
+    } else {
         setTimeout(() => {
             if (window.lastScrollTarget === cardNumber) {
                 cardElement.classList.add('focused');
             }
             window.isScrolling = false;
-        }, 800);
-    } else {
-        const targetPosition = cardElement.offsetTop - 120;
-        const startPosition = window.pageYOffset;
-        const scrollDistance = targetPosition - startPosition;
-        const duration = Math.min(Math.abs(scrollDistance) * 0.4, 800);
-        
-        let start = null;
-        
-        function smoothScrollStep(timestamp) {
-            if (window.lastScrollTarget !== cardNumber) {
-                window.isScrolling = false;
-                return;
-            }
-            
-            if (!start) start = timestamp;
-            const progress = Math.min((timestamp - start) / duration, 1);
-            
-            const ease = progress * (2 - progress);
-            const currentPosition = startPosition + (scrollDistance * ease);
-            
-            window.scrollTo(0, currentPosition);
-            
-            if (progress < 1) {
-                requestAnimationFrame(smoothScrollStep);
-            } else {
-                setTimeout(() => {
-                    if (window.lastScrollTarget === cardNumber) {
-                        cardElement.classList.add('focused');
-                    }
-                    window.isScrolling = false;
-                }, 100);
-            }
-        }
-        
-        requestAnimationFrame(smoothScrollStep);
+        }, 100);
     }
 }
+
+requestAnimationFrame(smoothScrollStep);
         const enneagramData = [
             {
                 type: "Type 1—The Strict Perfectionist",
