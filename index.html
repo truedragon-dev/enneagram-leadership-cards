@@ -556,6 +556,7 @@
     <script>
         // Simple, smooth navigation function
 function scrollToCard(cardNumber) {
+     if (event) event.stopPropagation();
     console.log('scrollToCard called with:', cardNumber); // Debug log
     
     const cardElement = document.querySelector(`[data-card="${cardNumber}"]`);
