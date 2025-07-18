@@ -213,25 +213,27 @@
             height: 950px;
             scroll-margin-top: 120px;
         }
-/* Focus highlight animation */
-.card-container.focused {
-    animation: cardFocus 1.2s ease-out;
-}
 
-@keyframes cardFocus {
-    0% {
-        transform: scale(1);
-        box-shadow: 0 0 0 0 rgba(102, 126, 234, 0);
-    }
-    40% {
-        transform: scale(1.01);
-        box-shadow: 0 0 0 15px rgba(102, 126, 234, 0.15);
-    }
-    100% {
-        transform: scale(1);
-        box-shadow: 0 0 0 0 rgba(102, 126, 234, 0);
-    }
-}
+        /* Focus highlight animation */
+        .card-container.focused {
+            animation: cardFocus 1.2s ease-out;
+        }
+
+        @keyframes cardFocus {
+            0% {
+                transform: scale(1);
+                box-shadow: 0 0 0 0 rgba(102, 126, 234, 0);
+            }
+            40% {
+                transform: scale(1.01);
+                box-shadow: 0 0 0 15px rgba(102, 126, 234, 0.15);
+            }
+            100% {
+                transform: scale(1);
+                box-shadow: 0 0 0 0 rgba(102, 126, 234, 0);
+            }
+        }
+
         .card {
             position: relative;
             width: 100%;
@@ -555,79 +557,79 @@
 
     <script>
         // Simple, smooth navigation function
-function scrollToCard(cardNumber) {
-    console.log('scrollToCard called with:', cardNumber);
-    
-    window.lastScrollTarget = cardNumber;
-    
-    const cardElement = document.querySelector(`[data-card="${cardNumber}"]`);
-    if (!cardElement) {
-        console.error('Card element not found for:', cardNumber);
-        return;
-    }
-    
-    // Always remove focus from other cards first
-    document.querySelectorAll('.card-container').forEach(card => {
-        card.classList.remove('focused');
-    });
-    
-    // Check if we're already at target
-    const currentScroll = window.pageYOffset;
-    const targetScroll = cardElement.offsetTop - 120;
-    const distance = Math.abs(currentScroll - targetScroll);
+        function scrollToCard(cardNumber) {
+            console.log('scrollToCard called with:', cardNumber);
+            
+            window.lastScrollTarget = cardNumber;
+            
+            const cardElement = document.querySelector(`[data-card="${cardNumber}"]`);
+            if (!cardElement) {
+                console.error('Card element not found for:', cardNumber);
+                return;
+            }
+            
+            // Always remove focus from other cards first
+            document.querySelectorAll('.card-container').forEach(card => {
+                card.classList.remove('focused');
+            });
+            
+            // Check if we're already at target
+            const currentScroll = window.pageYOffset;
+            const targetScroll = cardElement.offsetTop - 120;
+            const distance = Math.abs(currentScroll - targetScroll);
 
-    if (distance < 50) {
-        console.log('Already at target, just adding focus animation');
-        cardElement.classList.add('focused');
-        return;
-    }
-    
-    if (window.isScrolling) {
-        console.log('Already scrolling, ignoring request');
-        return;
-    }
-    
-    window.isScrolling = true;
-    // REMOVED: The duplicate focus cleanup that was here
-    
-    const isMobile = window.innerWidth <= 768 || 'ontouchstart' in window;
-    
-    // Use custom smooth scroll for both mobile and desktop
-    const targetPosition = cardElement.offsetTop - (isMobile ? 80 : 120);
-    const startPosition = window.pageYOffset;
-    const scrollDistance = targetPosition - startPosition;
-    const duration = Math.min(Math.abs(scrollDistance) * (isMobile ? 0.5 : 0.4), isMobile ? 1000 : 800);
+            if (distance < 50) {
+                console.log('Already at target, just adding focus animation');
+                cardElement.classList.add('focused');
+                return;
+            }
+            
+            if (window.isScrolling) {
+                console.log('Already scrolling, ignoring request');
+                return;
+            }
+            
+            window.isScrolling = true;
+            
+            const isMobile = window.innerWidth <= 768 || 'ontouchstart' in window;
+            
+            // Use custom smooth scroll for both mobile and desktop
+            const targetPosition = cardElement.offsetTop - (isMobile ? 80 : 120);
+            const startPosition = window.pageYOffset;
+            const scrollDistance = targetPosition - startPosition;
+            const duration = Math.min(Math.abs(scrollDistance) * (isMobile ? 0.5 : 0.4), isMobile ? 1000 : 800);
 
-    let start = null;
+            let start = null;
 
-    function smoothScrollStep(timestamp) {
-        if (window.lastScrollTarget !== cardNumber) {
-            window.isScrolling = false;
-            return;
-        }
-        
-        if (!start) start = timestamp;
-        const progress = Math.min((timestamp - start) / duration, 1);
-        
-        const ease = progress * (2 - progress);
-        const currentPosition = startPosition + (scrollDistance * ease);
-        
-        window.scrollTo(0, currentPosition);
-        
-        if (progress < 1) {
-            requestAnimationFrame(smoothScrollStep);
-        } else {
-            setTimeout(() => {
-                if (window.lastScrollTarget === cardNumber) {
-                    cardElement.classList.add('focused');
+            function smoothScrollStep(timestamp) {
+                if (window.lastScrollTarget !== cardNumber) {
+                    window.isScrolling = false;
+                    return;
                 }
-                window.isScrolling = false;
-            }, 100);
-        }
-    }
+                
+                if (!start) start = timestamp;
+                const progress = Math.min((timestamp - start) / duration, 1);
+                
+                const ease = progress * (2 - progress);
+                const currentPosition = startPosition + (scrollDistance * ease);
+                
+                window.scrollTo(0, currentPosition);
+                
+                if (progress < 1) {
+                    requestAnimationFrame(smoothScrollStep);
+                } else {
+                    setTimeout(() => {
+                        if (window.lastScrollTarget === cardNumber) {
+                            cardElement.classList.add('focused');
+                        }
+                        window.isScrolling = false;
+                    }, 100);
+                }
+            }
 
-    requestAnimationFrame(smoothScrollStep);
-}
+            requestAnimationFrame(smoothScrollStep);
+        }
+
         const enneagramData = [
             {
                 type: "Type 1—The Strict Perfectionist",
@@ -767,65 +769,65 @@ function scrollToCard(cardNumber) {
         ];
 
         function createCard(data) {
-    return `
-        <div class="card-container" data-card="${data.number}">
-            <div class="card type-${data.number}" onclick="flipCard(this)">
-                <div class="card-face type-${data.number}">
-                    <div class="type-header">
-                        <div class="type-number">${data.number}</div>
-                        <div class="type-name">${data.type.replace(/Type \d+—/, '')}</div>
+            return `
+                <div class="card-container" data-card="${data.number}">
+                    <div class="card type-${data.number}" onclick="flipCard(this)">
+                        <div class="card-face type-${data.number}">
+                            <div class="type-header">
+                                <div class="type-number">${data.number}</div>
+                                <div class="type-name">${data.type.replace(/Type \d+—/, '')}</div>
+                            </div>
+                            
+                            <div class="section">
+                                <div class="section-title core-drive">Core Drive</div>
+                                <div class="section-content">${data.coreDrive}</div>
+                            </div>
+                            
+                            <div class="section">
+                                <div class="section-title leads-through">Leads Through</div>
+                                <div class="section-content">${data.leadsThrough}</div>
+                            </div>
+                            
+                            <div class="section">
+                                <div class="section-title interaction-style">Interaction Style</div>
+                                <div class="section-content">${data.interactionStyle}</div>
+                            </div>
+                            
+                            <div class="section">
+                                <div class="section-title shadow-watch">Shadow Watch</div>
+                                <div class="section-content">${data.shadowWatch}</div>
+                            </div>
+                            
+                            <div class="section">
+                                <div class="section-title growth-edge">Growth Edge</div>
+                                <div class="section-content">${data.growthEdge}</div>
+                            </div>
+                            
+                            <div class="attribution">
+                                created by allan @ truedragon.io
+                            </div>
+                            
+                            <div class="flip-indicator">Click to flip →</div>
+                        </div>
+                        
+                        <div class="card-face card-back type-${data.number}">
+                            <div class="type-header">
+                                <div class="type-number">${data.number}</div>
+                                <div class="type-name">${data.type.replace(/Type \d+—/, '')}</div>
+                            </div>
+                            
+                            <div class="field-title">Questions for Higher Team IQ</div>
+                            
+                            ${data.fieldQuestions.map(question => 
+                                `<div class="field-question">${question}</div>`
+                            ).join('')}
+                            
+                            <div class="flip-indicator">← Click to flip back</div>
+                        </div>
                     </div>
-                    
-                    <div class="section">
-                        <div class="section-title core-drive">Core Drive</div>
-                        <div class="section-content">${data.coreDrive}</div>
-                    </div>
-                    
-                    <div class="section">
-                        <div class="section-title leads-through">Leads Through</div>
-                        <div class="section-content">${data.leadsThrough}</div>
-                    </div>
-                    
-                    <div class="section">
-                        <div class="section-title interaction-style">Interaction Style</div>
-                        <div class="section-content">${data.interactionStyle}</div>
-                    </div>
-                    
-                    <div class="section">
-                        <div class="section-title shadow-watch">Shadow Watch</div>
-                        <div class="section-content">${data.shadowWatch}</div>
-                    </div>
-                    
-                    <div class="section">
-                        <div class="section-title growth-edge">Growth Edge</div>
-                        <div class="section-content">${data.growthEdge}</div>
-                    </div>
-                    
-                    <div class="attribution">
-                        created by allan @ truedragon.io
-                    </div>
-                    
-                    <div class="flip-indicator">Click to flip →</div>
                 </div>
-                
-                <div class="card-face card-back type-${data.number}">
-                    <div class="type-header">
-                        <div class="type-number">${data.number}</div>
-                        <div class="type-name">${data.type.replace(/Type \d+—/, '')}</div>
-                    </div>
-                    
-                    <div class="field-title">Questions for Higher Team IQ</div>
-                    
-                    ${data.fieldQuestions.map(question => 
-                        `<div class="field-question">${question}</div>`
-                    ).join('')}
-                    
-                    <div class="flip-indicator">← Click to flip back</div>
-                </div>
-            </div>
-        </div>
-    `;
-}
+            `;
+        }
 
         function flipCard(card) {
             card.classList.toggle('flipped');
@@ -1067,52 +1069,52 @@ function scrollToCard(cardNumber) {
           inactivityTimer = setTimeout(trackSessionSummary, 30000);
         }
 
-    // Event listeners
-window.addEventListener('beforeunload', function() {
-  currentlyViewedCards.forEach((startTime, enneagramType) => {
-    const timeSpent = Math.round((Date.now() - startTime) / 1000);
-    if (timeSpent >= 2) {
-      const existingTime = cardEngagementTimes.get(enneagramType) || 0;
-      cardEngagementTimes.set(enneagramType, existingTime + timeSpent);
-      
-      gtag('event', 'final_card_engagement', {
-        'event_category': 'session_end',
-        'enneagram_type': enneagramType,
-        'engagement_seconds': timeSpent,
-        'total_card_time': cardEngagementTimes.get(enneagramType)
-      });
-    }
-  });
-  
-  trackSessionSummary();
-});
+        // Event listeners
+        window.addEventListener('beforeunload', function() {
+          currentlyViewedCards.forEach((startTime, enneagramType) => {
+            const timeSpent = Math.round((Date.now() - startTime) / 1000);
+            if (timeSpent >= 2) {
+              const existingTime = cardEngagementTimes.get(enneagramType) || 0;
+              cardEngagementTimes.set(enneagramType, existingTime + timeSpent);
+              
+              gtag('event', 'final_card_engagement', {
+                'event_category': 'session_end',
+                'enneagram_type': enneagramType,
+                'engagement_seconds': timeSpent,
+                'total_card_time': cardEngagementTimes.get(enneagramType)
+              });
+            }
+          });
+          
+          trackSessionSummary();
+        });
 
-// Single improved click listener that excludes navigation buttons
-document.addEventListener('click', function(e) {
-  // SKIP navigation buttons entirely - don't track or interfere
-  if (e.target.closest('.nav-button')) {
-    return;
-  }
-  
-  // Reset inactivity timer for non-nav clicks only
-  resetInactivityTimer();
-  
-  // Track card flips only for actual card clicks
-  const card = e.target.closest('.card');
-  if (card) {
-    const typeMatch = card.className.match(/type-(\d+)/);
-    const enneagramType = typeMatch ? typeMatch[1] : 'experiment';
-    
-    setTimeout(() => {
-      const isShowingTeam = card.classList.contains('flipped');
-      const currentSide = isShowingTeam ? 'team' : 'individual';
-      
-      trackCardFlip(enneagramType, currentSide);
-    }, 50);
-  }
-});
+        // Single improved click listener that excludes navigation buttons
+        document.addEventListener('click', function(e) {
+          // SKIP navigation buttons entirely - don't track or interfere
+          if (e.target.closest('.nav-button')) {
+            return;
+          }
+          
+          // Reset inactivity timer for non-nav clicks only
+          resetInactivityTimer();
+          
+          // Track card flips only for actual card clicks
+          const card = e.target.closest('.card');
+          if (card) {
+            const typeMatch = card.className.match(/type-(\d+)/);
+            const enneagramType = typeMatch ? typeMatch[1] : 'experiment';
+            
+            setTimeout(() => {
+              const isShowingTeam = card.classList.contains('flipped');
+              const currentSide = isShowingTeam ? 'team' : 'individual';
+              
+              trackCardFlip(enneagramType, currentSide);
+            }, 50);
+          }
+        });
 
-document.addEventListener('keypress', resetInactivityTimer);
+        document.addEventListener('keypress', resetInactivityTimer);
 
         // Initial page load tracking
         gtag('event', 'page_load', {
@@ -1124,4 +1126,4 @@ document.addEventListener('keypress', resetInactivityTimer);
         setTimeout(setupViewTracking, 1000);
     </script>
 </body>
-</html> 
+</html>
