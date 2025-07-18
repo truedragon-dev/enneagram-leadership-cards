@@ -551,16 +551,18 @@
 function scrollToCard(cardNumber) {
     const cardElement = document.querySelector(`[data-card="${cardNumber}"]`);
     if (cardElement) {
+        // Remove any existing focus
+        document.querySelectorAll('.card-container').forEach(card => {
+            card.classList.remove('focused');
+        });
+        
         // Calculate proper scroll position
         const elementTop = cardElement.offsetTop;
-        const navHeight = 120; // Height of sticky navigation
+        const navHeight = 120;
         const windowHeight = window.innerHeight;
         const documentHeight = document.documentElement.scrollHeight;
         
-        // Target position accounting for navigation
         let targetScroll = elementTop - navHeight;
-        
-        // Don't scroll past the bottom of the document
         const maxScroll = documentHeight - windowHeight;
         targetScroll = Math.min(targetScroll, maxScroll);
         
@@ -569,6 +571,32 @@ function scrollToCard(cardNumber) {
             top: targetScroll,
             behavior: 'smooth'
         });
+        
+        // Detect when scroll actually finishes
+        let isScrolling = false;
+        let scrollTimer;
+        
+        const onScroll = () => {
+            isScrolling = true;
+            clearTimeout(scrollTimer);
+            
+            scrollTimer = setTimeout(() => {
+                isScrolling = false;
+                // Add animation after scroll completes
+                cardElement.classList.add('focused');
+                window.removeEventListener('scroll', onScroll);
+            }, 100); // Wait 100ms after scroll stops
+        };
+        
+        window.addEventListener('scroll', onScroll);
+        
+        // Fallback: remove listener after 3 seconds
+        setTimeout(() => {
+            window.removeEventListener('scroll', onScroll);
+            if (!cardElement.classList.contains('focused')) {
+                cardElement.classList.add('focused');
+            }
+        }, 3000);
     }
 }
         const enneagramData = [
