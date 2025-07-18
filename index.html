@@ -25,72 +25,6 @@
 
     <!-- PWA Service Worker Registration -->
     <script>
-    // Force navigation visibility on mobile devices (especially Chrome iOS)
-    const isMobile = window.innerWidth <= 768 || /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-    
-    if (isMobile) {
-        console.log('Mobile device detected - applying navigation fix');
-        // Create mobile nav styles that override everything
-        const mobileNavStyles = document.createElement('style');
-        mobileNavStyles.id = 'mobile-nav-override';
-        mobileNavStyles.textContent = `
-            @media (max-width: 768px) {
-                .navigation {
-                    position: fixed !important;
-                    top: 0 !important;
-                    left: 0 !important;
-                    right: 0 !important;
-                    width: 100% !important;
-                    margin: 0 !important;
-                    background: rgba(255, 255, 255, 0.98) !important;
-                    z-index: 999 !important;
-                    display: block !important;
-                    visibility: visible !important;
-                    opacity: 1 !important;
-                    border-radius: 0 !important;
-                    backdrop-filter: none !important;
-                    -webkit-backdrop-filter: none !important;
-                }
-                
-                body {
-                    padding-top: 70px !important;
-                }
-                
-                .container {
-                    margin-top: 10px !important;
-                }
-                
-                .nav-buttons {
-                    display: flex !important;
-                    justify-content: center !important;
-                    flex-wrap: wrap !important;
-                    gap: 6px !important;
-                    padding: 8px 10px !important;
-                }
-                
-                .nav-button {
-                    display: inline-flex !important;
-                    align-items: center !important;
-                    justify-content: center !important;
-                    visibility: visible !important;
-                    opacity: 1 !important;
-                    padding: 10px 12px !important;
-                    font-size: 14px !important;
-                    min-width: 38px !important;
-                    min-height: 38px !important;
-                    border-radius: 19px !important;
-                }
-                
-                .nav-button.experiment {
-                    padding: 8px 10px !important;
-                    min-width: 42px !important;
-                    font-size: 16px !important;
-                }
-            }
-        `;
-        document.head.appendChild(mobileNavStyles);
-    }
-
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
         navigator.serviceWorker.register('/enneagram-leadership-cards/sw.js')
@@ -392,20 +326,21 @@
 
         .attribution {
             margin-top: auto;
+            margin-bottom: 40px;
             font-size: 0.75em;
             color: #9ca3af;
             font-style: italic;
-            padding-bottom: 15px;
         }
 
         .flip-indicator {
+            position: absolute;
+            bottom: 15px;
+            right: 15px;
             font-size: 0.8em;
             color: #718096;
             background: rgba(255, 255, 255, 0.8);
             padding: 5px 10px;
             border-radius: 15px;
-            text-align: center;
-            margin-bottom: 10px;
         }
 
         .core-drive { color: #e53e3e; }
@@ -661,18 +596,44 @@
             const isMobile = window.innerWidth <= 768 || 'ontouchstart' in window;
             
             if (isMobile) {
-                // Simple mobile scroll
-                cardElement.scrollIntoView({ 
-                    behavior: 'smooth', 
-                    block: 'start'
-                });
+                // Disable any existing scrolling first
+                document.documentElement.style.scrollBehavior = 'auto';
                 
-                setTimeout(() => {
-                    if (window.lastScrollTarget === cardNumber) {
-                        cardElement.classList.add('focused');
+                const targetPosition = cardElement.offsetTop - 80;
+                const startPosition = window.pageYOffset;
+                const scrollDistance = targetPosition - startPosition;
+                const duration = Math.min(Math.abs(scrollDistance) * 0.6, 1200); // Slower for mobile
+                
+                let start = null;
+                
+                function mobileScrollStep(timestamp) {
+                    if (window.lastScrollTarget !== cardNumber) {
+                        window.isScrolling = false;
+                        return;
                     }
-                    window.isScrolling = false;
-                }, 1000);
+                    
+                    if (!start) start = timestamp;
+                    const progress = Math.min((timestamp - start) / duration, 1);
+                    
+                    // More aggressive easing for mobile
+                    const ease = 1 - Math.pow(1 - progress, 3);
+                    const currentPosition = startPosition + (scrollDistance * ease);
+                    
+                    window.scrollTo(0, currentPosition);
+                    
+                    if (progress < 1) {
+                        requestAnimationFrame(mobileScrollStep);
+                    } else {
+                        setTimeout(() => {
+                            if (window.lastScrollTarget === cardNumber) {
+                                cardElement.classList.add('focused');
+                            }
+                            window.isScrolling = false;
+                        }, 100);
+                    }
+                }
+                
+                requestAnimationFrame(mobileScrollStep);
             } else {
                 // Desktop smooth scroll
                 const targetPosition = cardElement.offsetTop - 120;
