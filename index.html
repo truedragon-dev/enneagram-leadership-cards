@@ -619,99 +619,62 @@
             }
 
 createExperimentCard() {
-    return `
-        <div class="card-container" data-card="experiment">
-            <div class="card experiment-card" data-type="experiment">
+  return `
+    <div class="card-container" data-card="experiment">
+      <div class="card experiment-card" data-type="experiment">
 
-                <!-- Front of the Card -->
-                <div class="card-face experiment-card">
-                    <div class="experiment-header">
-                        <div class="experiment-icon">⚡</div>
-                        <div class="experiment-title">Team Field Experiment</div>
-                    </div>
+        <!-- FRONT -->
+        <div class="card-face experiment-card">
+          <div class="experiment-header">
+            <div class="experiment-icon">⚡</div>
+            <div class="experiment-title">This Week’s Field Experiment</div>
+          </div>
 
-                    <div class="experiment-content">
-                        <div class="current-experiment">
-                            <div class="experiment-label">This Week's Invitation:</div>
-                            <div class="experiment-practice">
-                                Choose someone’s growth edge in the room. Practice it as a team all week.<br><br>
-                                Not to fix them. To become more like them.
-                            </div>
-                        </div>
-
-                        <div class="experiment-instructions">
-                            <div class="instruction-step">
-                                <span class="step-number">1.</span>
-                                <span class="step-text">Choose an edge that’s alive in the room (not necessarily on a card).</span>
-                            </div>
-                            <div class="instruction-step">
-                                <span class="step-number">2.</span>
-                                <span class="step-text">Turn it into a shared practice. One sentence. One shift.</span>
-                            </div>
-                            <div class="instruction-step">
-                                <span class="step-number">3.</span>
-                                <span class="step-text">Friday: Don’t just ask “Did we do it?” Ask “What did it show us about us?”</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="flip-indicator">Click to see edge-in-action →</div>
-
-                    <div class="attribution">
-                        designed by allan @ truedragon.io
-                    </div>
-                </div>
-
-                <!-- Back of the Card -->
-                <div class="card-face card-back experiment-card">
-                    <div class="experiment-header">
-                        <div class="experiment-icon">💡</div>
-                        <div class="experiment-title">Examples (Do One. Feel Everything.)</div>
-                    </div>
-
-                    <div class="experiment-examples">
-                        <div class="example-card">
-                            <div class="example-type">Type 7 – Stay With It</div>
-                            <div class="example-text">
-                                “This week: Stay with one difficult conversation until it gets awkward, quiet, or real. No pivoting. No fast-forwarding.”
-                            </div>
-                        </div>
-
-                        <div class="example-card">
-                            <div class="example-type">Type 3 – Break the Performance</div>
-                            <div class="example-text">
-                                “This week: Open one meeting with something unpolished. No story, no spin—just what’s true and unfinished.”
-                            </div>
-                        </div>
-
-                        <div class="example-card">
-                            <div class="example-type">Type 8 – Ask Before You Dominate</div>
-                            <div class="example-text">
-                                “This week: Say ‘I don’t know’ or ‘What do you see?’ before you act. Let someone else lead for one beat longer than feels comfortable.”
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="flip-indicator">← Flip back</div>
-
-                    <div class="attribution">
-                        designed by allan @ truedragon.io
-                    </div>
-                </div>
+          <div class="experiment-content">
+            <div class="experiment-practice">
+              Let’s use the edge of one person’s growth as the whole team’s experiment.<br><br>
+              Choose an edge someone’s working on. Practice it together.  
+              Not as a task—*as a mirror.* See what it reveals in the field.
             </div>
+
+            <div class="experiment-instructions">
+              <div class="instruction-step"><strong>1.</strong> Name a live edge—not just a type, but a tension that’s present.</div>
+              <div class="instruction-step"><strong>2.</strong> Translate it into a behavior the whole team can try this week.</div>
+              <div class="instruction-step"><strong>3.</strong> Track what changes: energy, conflict, clarity, silence.</div>
+              <div class="instruction-step"><strong>4.</strong> Debrief Friday: What did it stir up? What moved?</div>
+            </div>
+          </div>
+
+          <div class="flip-indicator">Click to see edge-based examples →</div>
+          <div class="attribution">designed by allan @ truedragon.io</div>
         </div>
-    `;
+
+        <!-- BACK -->
+        <div class="card-face card-back experiment-card">
+          <div class="experiment-header">
+            <div class="experiment-icon">💡</div>
+            <div class="experiment-title">Try One of These</div>
+          </div>
+
+          <div class="experiment-examples">
+            <div class="example-card"><strong>Type 1 Edge:</strong> Act before we’re ready. This week: ship it at 80%.</div>
+            <div class="example-card"><strong>Type 2 Edge:</strong> Make a direct request. This week: ask for what you need.</div>
+            <div class="example-card"><strong>Type 3 Edge:</strong> Show the messy middle. This week: share something in-progress.</div>
+            <div class="example-card"><strong>Type 4 Edge:</strong> Speak the unspoken. This week: name what feels emotionally real.</div>
+            <div class="example-card"><strong>Type 5 Edge:</strong> Reveal your thinking early. This week: show your draft.</div>
+            <div class="example-card"><strong>Type 6 Edge:</strong> Move before you're certain. This week: act on instinct once a day.</div>
+            <div class="example-card"><strong>Type 7 Edge:</strong> Stay in the hard part. This week: don’t reframe. Just stay.</div>
+            <div class="example-card"><strong>Type 8 Edge:</strong> Say “I don’t know” out loud. Let others lead for a moment.</div>
+            <div class="example-card"><strong>Type 9 Edge:</strong> Speak your true take. This week: lean into one hard truth.</div>
+          </div>
+
+          <div class="flip-indicator">← Flip back</div>
+          <div class="attribution">designed by allan @ truedragon.io</div>
+        </div>
+      </div>
+    </div>
+  `;
 }
-            setupEventListeners() {
-                // Card click handler
-                const cardClickHandler = (e) => {
-                    if (e.target.closest('.nav-button')) return;
-                    
-                    const card = e.target.closest('.card');
-                    if (card) {
-                        this.handleCardFlip(card);
-                    }
-                };
 
                 document.addEventListener('click', cardClickHandler);
                 this.eventHandlers.set('cardClick', cardClickHandler);
