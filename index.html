@@ -12,7 +12,7 @@
 
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Enneagram Leadership Cards v25</title>
+    <title>Enneagram Leadership Cards v26</title>
     
     <!-- PWA Meta Tags -->
     <link rel="manifest" href="manifest.json">
@@ -22,64 +22,6 @@
     <meta name="apple-mobile-web-app-title" content="Leadership Cards">
     <link rel="apple-touch-icon" href="icon-192.png">
     <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
-
-    <!-- PWA Service Worker Registration -->
-    <script>
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => {
-        navigator.serviceWorker.register('/enneagram-leadership-cards/sw.js')
-          .then((registration) => {
-            console.log('SW registered: ', registration);
-          })
-          .catch((registrationError) => {
-            console.log('SW registration failed: ', registrationError);
-          });
-      });
-    }
-
-    // PWA Install Prompt
-    let deferredPrompt;
-    const installButton = document.createElement('button');
-    installButton.style.cssText = `
-      position: fixed;
-      bottom: 20px;
-      right: 20px;
-      background: #764ba2;
-      color: white;
-      border: none;
-      padding: 12px 20px;
-      border-radius: 25px;
-      font-size: 14px;
-      cursor: pointer;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-      z-index: 1000;
-      display: none;
-    `;
-    installButton.textContent = '📱 Install App';
-    document.body.appendChild(installButton);
-
-    window.addEventListener('beforeinstallprompt', (e) => {
-      e.preventDefault();
-      deferredPrompt = e;
-      installButton.style.display = 'block';
-    });
-
-    installButton.addEventListener('click', () => {
-      installButton.style.display = 'none';
-      deferredPrompt.prompt();
-      deferredPrompt.userChoice.then((choiceResult) => {
-        if (choiceResult.outcome === 'accepted') {
-          console.log('User accepted the install prompt');
-        }
-        deferredPrompt = null;
-      });
-    });
-
-    window.addEventListener('appinstalled', () => {
-      console.log('PWA was installed');
-      installButton.style.display = 'none';
-    });
-    </script>
 
     <style>
         * {
@@ -563,31 +505,659 @@
     </div>
 
     <script>
-        // iOS-optimized scroll function - v25 fix
-        function scrollToCard(cardNumber) {
-            const cardElement = document.querySelector(`[data-card="${cardNumber}"]`);
-            if (!cardElement) {
-                console.error('Card element not found for:', cardNumber);
-                return;
+        // Application state management
+        class EnneagramApp {
+            constructor() {
+                this.initialized = false;
+                this.observers = [];
+                this.timers = [];
+                this.eventHandlers = new Map();
+                this.scrollManager = new ScrollManager();
+                this.analytics = new AnalyticsManager();
+                
+                // Bind methods to maintain context
+                this.handleCardFlip = this.handleCardFlip.bind(this);
+                this.cleanup = this.cleanup.bind(this);
             }
-            
-            // Remove focus from all cards
-            document.querySelectorAll('.card-container').forEach(card => {
-                card.classList.remove('focused');
-            });
-            
-            // Use native scrollIntoView for iOS compatibility
-            cardElement.scrollIntoView({
-                behavior: 'smooth',
-                block: 'start'
-            });
-            
-            // Add focus animation after scroll completes
-            setTimeout(() => {
-                cardElement.classList.add('focused');
-            }, 600);
+
+            init() {
+                if (this.initialized) {
+                    console.warn('App already initialized');
+                    return;
+                }
+
+                try {
+                    this.renderCards();
+                    this.setupEventListeners();
+                    this.setupPWA();
+                    this.analytics.init();
+                    this.scrollManager.addCallback(() => this.flipBackVisibleCards());
+                    
+                    this.initialized = true;
+                    console.log('Enneagram app initialized successfully');
+                } catch (error) {
+                    console.error('Failed to initialize app:', error);
+                    this.showErrorMessage();
+                }
+            }
+
+            renderCards() {
+                const grid = document.getElementById('cardGrid');
+                if (!grid) {
+                    throw new Error('Card grid element not found');
+                }
+                
+                const typeCards = enneagramData.map(data => this.createCard(data)).join('');
+                const experimentCard = this.createExperimentCard();
+                
+                grid.innerHTML = typeCards + experimentCard;
+            }
+
+            createCard(data) {
+                return `
+                    <div class="card-container" data-card="${data.number}">
+                        <div class="card type-${data.number}" data-type="${data.number}">
+                            <div class="card-face type-${data.number}">
+                                <div class="type-header">
+                                    <div class="type-number">${data.number}</div>
+                                    <div class="type-name">${data.type.replace(/Type \d+—/, '')}</div>
+                                </div>
+                                
+                                <div class="section">
+                                    <div class="section-title core-drive">Core Drive</div>
+                                    <div class="section-content">${data.coreDrive}</div>
+                                </div>
+                                
+                                <div class="section">
+                                    <div class="section-title leads-through">Leads Through</div>
+                                    <div class="section-content">${data.leadsThrough}</div>
+                                </div>
+                                
+                                <div class="section">
+                                    <div class="section-title interaction-style">Interaction Style</div>
+                                    <div class="section-content">${data.interactionStyle}</div>
+                                </div>
+                                
+                                <div class="section">
+                                    <div class="section-title shadow-watch">Shadow Watch</div>
+                                    <div class="section-content">${data.shadowWatch}</div>
+                                </div>
+                                
+                                <div class="section">
+                                    <div class="section-title growth-edge">Growth Edge</div>
+                                    <div class="section-content">${data.growthEdge}</div>
+                                </div>
+                                
+                                <div class="flip-indicator">Click to flip →</div>
+                                
+                                <div class="attribution">
+                                    created by allan @ truedragon.io
+                                </div>
+                            </div>
+                            
+                            <div class="card-face card-back type-${data.number}">
+                                <div class="type-header">
+                                    <div class="type-number">${data.number}</div>
+                                    <div class="type-name">${data.type.replace(/Type \d+—/, '')}</div>
+                                </div>
+                                
+                                <div class="field-title">Questions for Higher Team IQ</div>
+                                
+                                ${data.fieldQuestions.map(question => 
+                                    `<div class="field-question">${question}</div>`
+                                ).join('')}
+                                
+                                <div class="flip-indicator">← Click to flip back</div>
+                                
+                                <div class="attribution">
+                                    created by allan @ truedragon.io
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            createExperimentCard() {
+                return `
+                    <div class="card-container" data-card="experiment">
+                        <div class="card experiment-card" data-type="experiment">
+                            <div class="card-face experiment-card">
+                                <div class="experiment-header">
+                                    <div class="experiment-icon">⚡</div>
+                                    <div class="experiment-title">Weekly Team Experiment</div>
+                                </div>
+                                
+                                <div class="experiment-content">
+                                    <div class="current-experiment">
+                                        <div class="experiment-label">This Week's Focus:</div>
+                                        <div class="experiment-practice">
+                                            Choose a growth edge from someone present and practice it together as a team this week.
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="experiment-instructions">
+                                        <div class="instruction-step">
+                                            <span class="step-number">1.</span>
+                                            <span class="step-text">Pick one person's growth edge from the cards</span>
+                                        </div>
+                                        <div class="instruction-step">
+                                            <span class="step-number">2.</span>
+                                            <span class="step-text">Adapt it for team practice this week</span>
+                                        </div>
+                                        <div class="instruction-step">
+                                            <span class="step-number">3.</span>
+                                            <span class="step-text">Check in Friday: What did we discover?</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="flip-indicator">Click to see examples →</div>
+                                
+                                <div class="attribution">
+                                    created by allan @ truedragon.io
+                                </div>
+                            </div>
+                            
+                            <div class="card-face card-back experiment-card">
+                                <div class="experiment-header">
+                                    <div class="experiment-icon">💡</div>
+                                    <div class="experiment-title">Example Team Experiments</div>
+                                </div>
+                                
+                                <div class="experiment-examples">
+                                    <div class="example-card">
+                                        <div class="example-type">Type 7 Growth Edge</div>
+                                        <div class="example-text">"This week: Stay with one difficult conversation until it reaches resolution. Don't pivot or find creative ways around the constraint."</div>
+                                    </div>
+                                    
+                                    <div class="example-card">
+                                        <div class="example-type">Type 3 Growth Edge</div>
+                                        <div class="example-text">"This week: Prioritize authenticity over looking successful. Share what's messy or imperfect instead of waiting until we look polished."</div>
+                                    </div>
+                                    
+                                    <div class="example-card">
+                                        <div class="example-type">Type 8 Growth Edge</div>
+                                        <div class="example-text">"This week: Share uncertainties and ask for help before we feel strong enough. Practice saying 'We don't know' and 'We need support.'"</div>
+                                    </div>
+                                </div>
+                                
+                                <div class="flip-indicator">← Click to flip back</div>
+                                
+                                <div class="attribution">
+                                    created by allan @ truedragon.io
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            setupEventListeners() {
+                // Card click handler
+                const cardClickHandler = (e) => {
+                    if (e.target.closest('.nav-button')) return;
+                    
+                    const card = e.target.closest('.card');
+                    if (card) {
+                        this.handleCardFlip(card);
+                    }
+                };
+
+                document.addEventListener('click', cardClickHandler);
+                this.eventHandlers.set('cardClick', cardClickHandler);
+
+                // Keyboard handler
+                const keyHandler = (e) => {
+                    this.analytics.resetInactivityTimer();
+                };
+
+                document.addEventListener('keypress', keyHandler);
+                this.eventHandlers.set('keypress', keyHandler);
+
+                // Cleanup on page unload
+                window.addEventListener('beforeunload', this.cleanup);
+                this.eventHandlers.set('beforeunload', this.cleanup);
+            }
+
+            handleCardFlip(card) {
+                try {
+                    card.classList.toggle('flipped');
+                    this.analytics.resetInactivityTimer();
+                    
+                    const typeAttr = card.getAttribute('data-type');
+                    const enneagramType = typeAttr || 'experiment';
+                    
+                    setTimeout(() => {
+                        const isShowingTeam = card.classList.contains('flipped');
+                        const currentSide = isShowingTeam ? 'team' : 'individual';
+                        this.analytics.trackCardFlip(enneagramType, currentSide);
+                    }, 50);
+                } catch (error) {
+                    console.error('Error handling card flip:', error);
+                }
+            }
+
+            flipBackVisibleCards() {
+                try {
+                    const flippedCards = document.querySelectorAll('.card.flipped');
+                    if (flippedCards.length === 0) return;
+
+                    flippedCards.forEach(card => {
+                        if (this.isElementInViewport(card)) {
+                            card.classList.remove('flipped');
+                        }
+                    });
+                } catch (error) {
+                    console.error('Error flipping back cards:', error);
+                }
+            }
+
+            isElementInViewport(el) {
+                const rect = el.getBoundingClientRect();
+                return (rect.top < window.innerHeight && rect.bottom > 0);
+            }
+
+            setupPWA() {
+                if ('serviceWorker' in navigator) {
+                    navigator.serviceWorker.register('/enneagram-leadership-cards/sw.js')
+                        .then(registration => console.log('SW registered:', registration))
+                        .catch(error => console.log('SW registration failed:', error));
+                }
+
+                this.setupInstallPrompt();
+            }
+
+            setupInstallPrompt() {
+                let deferredPrompt;
+                const installButton = document.createElement('button');
+                installButton.style.cssText = `
+                    position: fixed;
+                    bottom: 20px;
+                    right: 20px;
+                    background: #764ba2;
+                    color: white;
+                    border: none;
+                    padding: 12px 20px;
+                    border-radius: 25px;
+                    font-size: 14px;
+                    cursor: pointer;
+                    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+                    z-index: 1000;
+                    display: none;
+                `;
+                installButton.textContent = '📱 Install App';
+                document.body.appendChild(installButton);
+
+                window.addEventListener('beforeinstallprompt', (e) => {
+                    e.preventDefault();
+                    deferredPrompt = e;
+                    installButton.style.display = 'block';
+                });
+
+                installButton.addEventListener('click', () => {
+                    installButton.style.display = 'none';
+                    if (deferredPrompt) {
+                        deferredPrompt.prompt();
+                        deferredPrompt.userChoice.then(() => {
+                            deferredPrompt = null;
+                        });
+                    }
+                });
+
+                window.addEventListener('appinstalled', () => {
+                    installButton.style.display = 'none';
+                });
+            }
+
+            showErrorMessage() {
+                const grid = document.getElementById('cardGrid');
+                if (grid) {
+                    grid.innerHTML = `
+                        <div style="text-align: center; padding: 40px; color: #721c24; background: #f8d7da; border-radius: 10px;">
+                            <h3>Something went wrong</h3>
+                            <p>Please refresh the page to try again.</p>
+                        </div>
+                    `;
+                }
+            }
+
+            cleanup() {
+                try {
+                    // Clean up observers
+                    this.observers.forEach(observer => {
+                        if (observer && typeof observer.disconnect === 'function') {
+                            observer.disconnect();
+                        }
+                    });
+                    this.observers = [];
+
+                    // Clear timers
+                    this.timers.forEach(timer => clearTimeout(timer));
+                    this.timers = [];
+
+                    // Remove event listeners
+                    this.eventHandlers.forEach((handler, event) => {
+                        if (event === 'beforeunload') {
+                            window.removeEventListener('beforeunload', handler);
+                        } else {
+                            document.removeEventListener(event, handler);
+                        }
+                    });
+                    this.eventHandlers.clear();
+
+                    // Cleanup scroll manager
+                    if (this.scrollManager) {
+                        this.scrollManager.cleanup();
+                    }
+
+                    // Cleanup analytics
+                    if (this.analytics) {
+                        this.analytics.cleanup();
+                    }
+
+                    this.initialized = false;
+                    console.log('App cleanup completed');
+                } catch (error) {
+                    console.error('Error during cleanup:', error);
+                }
+            }
         }
 
+        // Scroll Management
+        class ScrollManager {
+            constructor() {
+                this.callbacks = [];
+                this.throttleTimer = null;
+                this.handleScroll = this.handleScroll.bind(this);
+                this.init();
+            }
+
+            init() {
+                window.addEventListener('scroll', this.handleScroll, { passive: true });
+            }
+
+            addCallback(callback) {
+                if (typeof callback === 'function') {
+                    this.callbacks.push(callback);
+                }
+            }
+
+            handleScroll() {
+                if (!this.throttleTimer) {
+                    this.throttleTimer = setTimeout(() => {
+                        this.callbacks.forEach(callback => {
+                            try {
+                                callback();
+                            } catch (error) {
+                                console.error('Error in scroll callback:', error);
+                            }
+                        });
+                        this.throttleTimer = null;
+                    }, 100);
+                }
+            }
+
+            cleanup() {
+                window.removeEventListener('scroll', this.handleScroll);
+                if (this.throttleTimer) {
+                    clearTimeout(this.throttleTimer);
+                    this.throttleTimer = null;
+                }
+                this.callbacks = [];
+            }
+        }
+
+        // Analytics Management
+        class AnalyticsManager {
+            constructor() {
+                this.cardSession = {
+                    startTime: Date.now(),
+                    totalFlips: 0,
+                    individualViews: 0,
+                    teamViews: 0,
+                    typesViewed: new Set(),
+                    lastFlipTime: Date.now()
+                };
+
+                this.viewedCards = new Set();
+                this.cardEngagementTimes = new Map();
+                this.currentlyViewedCards = new Map();
+                this.viewObserver = null;
+                this.inactivityTimer = null;
+            }
+
+            init() {
+                try {
+                    this.setupViewTracking();
+                    this.trackPageLoad();
+                } catch (error) {
+                    console.error('Analytics initialization failed:', error);
+                }
+            }
+
+            setupViewTracking() {
+                if ('IntersectionObserver' in window) {
+                    this.viewObserver = new IntersectionObserver((entries) => {
+                        entries.forEach(entry => {
+                            try {
+                                if (entry.isIntersecting && entry.intersectionRatio > 0.5) {
+                                    this.trackCardView(entry.target);
+                                } else if (!entry.isIntersecting) {
+                                    this.trackCardExit(entry.target);
+                                }
+                            } catch (error) {
+                                console.error('Error in intersection observer:', error);
+                            }
+                        });
+                    }, {
+                        threshold: [0, 0.5]
+                    });
+
+                    // Observe cards after a short delay to ensure they're rendered
+                    setTimeout(() => {
+                        const cards = document.querySelectorAll('.card');
+                        cards.forEach(card => {
+                            if (this.viewObserver) {
+                                this.viewObserver.observe(card);
+                            }
+                        });
+                    }, 500);
+                }
+            }
+
+            trackCardFlip(enneagramType, newSide) {
+                try {
+                    this.cardSession.totalFlips++;
+                    this.cardSession.typesViewed.add(enneagramType);
+                    this.cardSession.lastFlipTime = Date.now();
+                    
+                    if (newSide === 'individual') {
+                        this.cardSession.individualViews++;
+                    } else if (newSide === 'team') {
+                        this.cardSession.teamViews++;
+                    }
+                    
+                    if (typeof gtag !== 'undefined') {
+                        gtag('event', 'card_flip', {
+                            'event_category': 'card_interaction',
+                            'event_label': `type_${enneagramType}_to_${newSide}`,
+                            'enneagram_type': enneagramType,
+                            'side_shown': newSide,
+                            'total_flips': this.cardSession.totalFlips,
+                            'session_duration': Math.round((Date.now() - this.cardSession.startTime) / 1000)
+                        });
+                    }
+                } catch (error) {
+                    console.error('Error tracking card flip:', error);
+                }
+            }
+
+            trackCardView(card) {
+                try {
+                    const typeMatch = card.className.match(/type-(\d+)/);
+                    const enneagramType = typeMatch ? typeMatch[1] : 'experiment';
+                    
+                    this.currentlyViewedCards.set(enneagramType, Date.now());
+                    
+                    if (!this.viewedCards.has(enneagramType)) {
+                        this.viewedCards.add(enneagramType);
+                        
+                        if (typeof gtag !== 'undefined') {
+                            gtag('event', 'card_viewed', {
+                                'event_category': 'card_exposure',
+                                'event_label': `type_${enneagramType}_viewed`,
+                                'enneagram_type': enneagramType,
+                                'side_shown': 'individual',
+                                'view_method': 'scroll'
+                            });
+                        }
+                    }
+                } catch (error) {
+                    console.error('Error tracking card view:', error);
+                }
+            }
+
+            trackCardExit(card) {
+                try {
+                    const typeMatch = card.className.match(/type-(\d+)/);
+                    const enneagramType = typeMatch ? typeMatch[1] : 'experiment';
+                    
+                    if (this.currentlyViewedCards.has(enneagramType)) {
+                        const startTime = this.currentlyViewedCards.get(enneagramType);
+                        const timeSpent = Math.round((Date.now() - startTime) / 1000);
+                        
+                        if (timeSpent >= 2) {
+                            const existingTime = this.cardEngagementTimes.get(enneagramType) || 0;
+                            this.cardEngagementTimes.set(enneagramType, existingTime + timeSpent);
+                            
+                            if (typeof gtag !== 'undefined') {
+                                gtag('event', 'card_engagement_time', {
+                                    'event_category': 'card_engagement',
+                                    'event_label': `type_${enneagramType}_${timeSpent}s`,
+                                    'enneagram_type': enneagramType,
+                                    'engagement_seconds': timeSpent,
+                                    'total_card_time': this.cardEngagementTimes.get(enneagramType)
+                                });
+                            }
+                        }
+                        
+                        this.currentlyViewedCards.delete(enneagramType);
+                    }
+                } catch (error) {
+                    console.error('Error tracking card exit:', error);
+                }
+            }
+
+            trackSessionSummary() {
+                try {
+                    const sessionDuration = Math.round((this.cardSession.lastFlipTime - this.cardSession.startTime) / 1000);
+                    const preferredSide = this.cardSession.individualViews > this.cardSession.teamViews ? 'individual' : 'team';
+                    
+                    if (typeof gtag !== 'undefined') {
+                        gtag('event', 'session_summary', {
+                            'session_duration': sessionDuration,
+                            'total_flips': this.cardSession.totalFlips,
+                            'unique_types': this.cardSession.typesViewed.size,
+                            'preferred_side': preferredSide,
+                            'individual_views': this.cardSession.individualViews,
+                            'team_views': this.cardSession.teamViews
+                        });
+                    }
+                } catch (error) {
+                    console.error('Error tracking session summary:', error);
+                }
+            }
+
+            trackPageLoad() {
+                try {
+                    if (typeof gtag !== 'undefined') {
+                        gtag('event', 'page_load', {
+                            'page_title': document.title,
+                            'page_location': window.location.href
+                        });
+                    }
+                } catch (error) {
+                    console.error('Error tracking page load:', error);
+                }
+            }
+
+            resetInactivityTimer() {
+                if (this.inactivityTimer) {
+                    clearTimeout(this.inactivityTimer);
+                }
+                this.inactivityTimer = setTimeout(() => {
+                    this.trackSessionSummary();
+                }, 30000);
+            }
+
+            cleanup() {
+                try {
+                    // Track final engagement for currently viewed cards
+                    this.currentlyViewedCards.forEach((startTime, enneagramType) => {
+                        const timeSpent = Math.round((Date.now() - startTime) / 1000);
+                        if (timeSpent >= 2) {
+                            const existingTime = this.cardEngagementTimes.get(enneagramType) || 0;
+                            this.cardEngagementTimes.set(enneagramType, existingTime + timeSpent);
+                            
+                            if (typeof gtag !== 'undefined') {
+                                gtag('event', 'final_card_engagement', {
+                                    'event_category': 'session_end',
+                                    'enneagram_type': enneagramType,
+                                    'engagement_seconds': timeSpent,
+                                    'total_card_time': this.cardEngagementTimes.get(enneagramType)
+                                });
+                            }
+                        }
+                    });
+                    
+                    this.trackSessionSummary();
+                    
+                    if (this.viewObserver) {
+                        this.viewObserver.disconnect();
+                        this.viewObserver = null;
+                    }
+                    
+                    if (this.inactivityTimer) {
+                        clearTimeout(this.inactivityTimer);
+                        this.inactivityTimer = null;
+                    }
+                } catch (error) {
+                    console.error('Error during analytics cleanup:', error);
+                }
+            }
+        }
+
+        // Navigation Functions (Global scope for onclick handlers)
+        function scrollToCard(cardNumber) {
+            try {
+                const cardElement = document.querySelector(`[data-card="${cardNumber}"]`);
+                if (!cardElement) {
+                    console.error('Card element not found for:', cardNumber);
+                    return;
+                }
+                
+                // Remove focus from all cards
+                document.querySelectorAll('.card-container').forEach(card => {
+                    card.classList.remove('focused');
+                });
+                
+                // Use native scrollIntoView for iOS compatibility
+                cardElement.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+                
+                // Add focus animation after scroll completes
+                setTimeout(() => {
+                    cardElement.classList.add('focused');
+                }, 600);
+            } catch (error) {
+                console.error('Error scrolling to card:', error);
+            }
+        }
+
+        // Enneagram Data
         const enneagramData = [
             {
                 type: "Type 1—The Strict Perfectionist",
@@ -726,422 +1296,24 @@
             }
         ];
 
-        function createCard(data) {
-            return `
-                <div class="card-container" data-card="${data.number}">
-                    <div class="card type-${data.number}" onclick="flipCard(this)">
-                        <div class="card-face type-${data.number}">
-                            <div class="type-header">
-                                <div class="type-number">${data.number}</div>
-                                <div class="type-name">${data.type.replace(/Type \d+—/, '')}</div>
-                            </div>
-                            
-                            <div class="section">
-                                <div class="section-title core-drive">Core Drive</div>
-                                <div class="section-content">${data.coreDrive}</div>
-                            </div>
-                            
-                            <div class="section">
-                                <div class="section-title leads-through">Leads Through</div>
-                                <div class="section-content">${data.leadsThrough}</div>
-                            </div>
-                            
-                            <div class="section">
-                                <div class="section-title interaction-style">Interaction Style</div>
-                                <div class="section-content">${data.interactionStyle}</div>
-                            </div>
-                            
-                            <div class="section">
-                                <div class="section-title shadow-watch">Shadow Watch</div>
-                                <div class="section-content">${data.shadowWatch}</div>
-                            </div>
-                            
-                            <div class="section">
-                                <div class="section-title growth-edge">Growth Edge</div>
-                                <div class="section-content">${data.growthEdge}</div>
-                            </div>
-                            
-                            <div class="flip-indicator">Click to flip →</div>
-                            
-                            <div class="attribution">
-                                created by allan @ truedragon.io
-                            </div>
-                        </div>
-                        
-                        <div class="card-face card-back type-${data.number}">
-                            <div class="type-header">
-                                <div class="type-number">${data.number}</div>
-                                <div class="type-name">${data.type.replace(/Type \d+—/, '')}</div>
-                            </div>
-                            
-                            <div class="field-title">Questions for Higher Team IQ</div>
-                            
-                            ${data.fieldQuestions.map(question => 
-                                `<div class="field-question">${question}</div>`
-                            ).join('')}
-                            
-                            <div class="flip-indicator">← Click to flip back</div>
-                            
-                            <div class="attribution">
-                                created by allan @ truedragon.io
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            `;
-        }
-
-        function flipCard(card) {
-            card.classList.toggle('flipped');
-        }
-
-        function renderCards() {
-            const grid = document.getElementById('cardGrid');
-            const typeCards = enneagramData.map(createCard).join('');
-            
-            // Add experiment card at the end
-            const experimentCard = `
-                <div class="card-container" data-card="experiment">
-                    <div class="card experiment-card" onclick="flipCard(this)">
-                        <div class="card-face experiment-card">
-                            <div class="experiment-header">
-                                <div class="experiment-icon">⚡</div>
-                                <div class="experiment-title">Weekly Team Experiment</div>
-                            </div>
-                            
-                            <div class="experiment-content">
-                                <div class="current-experiment">
-                                    <div class="experiment-label">This Week's Focus:</div>
-                                    <div class="experiment-practice" id="currentExperiment">
-                                        Choose a growth edge from someone present and practice it together as a team this week.
-                                    </div>
-                                </div>
-                                
-                                <div class="experiment-instructions">
-                                    <div class="instruction-step">
-                                        <span class="step-number">1.</span>
-                                        <span class="step-text">Pick one person's growth edge from the cards</span>
-                                    </div>
-                                    <div class="instruction-step">
-                                        <span class="step-number">2.</span>
-                                        <span class="step-text">Adapt it for team practice this week</span>
-                                    </div>
-                                    <div class="instruction-step">
-                                        <span class="step-number">3.</span>
-                                        <span class="step-text">Check in Friday: What did we discover?</span>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <div class="flip-indicator">Click to see examples →</div>
-                            
-                            <div class="attribution">
-                                created by allan @ truedragon.io
-                            </div>
-                        </div>
-                        
-                        <div class="card-face card-back experiment-card">
-                            <div class="experiment-header">
-                                <div class="experiment-icon">💡</div>
-                                <div class="experiment-title">Example Team Experiments</div>
-                            </div>
-                            
-                            <div class="experiment-examples">
-                                <div class="example-card">
-                                    <div class="example-type">Type 7 Growth Edge</div>
-                                    <div class="example-text">"This week: Stay with one difficult conversation until it reaches resolution. Don't pivot or find creative ways around the constraint."</div>
-                                </div>
-                                
-                                <div class="example-card">
-                                    <div class="example-type">Type 3 Growth Edge</div>
-                                    <div class="example-text">"This week: Prioritize authenticity over looking successful. Share what's messy or imperfect instead of waiting until we look polished."</div>
-                                </div>
-                                
-                                <div class="example-card">
-                                    <div class="example-type">Type 8 Growth Edge</div>
-                                    <div class="example-text">"This week: Share uncertainties and ask for help before we feel strong enough. Practice saying 'We don't know' and 'We need support.'"</div>
-                                </div>
-                            </div>
-                            
-                            <div class="flip-indicator">← Click to flip back</div>
-                            
-                            <div class="attribution">
-                                created by allan @ truedragon.io
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            `;
-            
-            grid.innerHTML = typeCards + experimentCard;
-        }
-
-        // Initialize cards
-     renderCards();
-setupViewTracking();
-setupScrollFlipReset();
-        // Analytics tracking setup
-        let cardSession = {
-          startTime: Date.now(),
-          totalFlips: 0,
-          individualViews: 0,
-          teamViews: 0,
-          typesViewed: new Set(),
-          lastFlipTime: Date.now()
-        };
-
-        let viewedCards = new Set();
-        let cardEngagementTimes = new Map();
-        let currentlyViewedCards = new Map();
-        let viewObserver;
-        let inactivityTimer;
-
-        function trackCardFlip(enneagramType, newSide) {
-          cardSession.totalFlips++;
-          cardSession.typesViewed.add(enneagramType);
-          cardSession.lastFlipTime = Date.now();
-          
-          if (newSide === 'individual') {
-            cardSession.individualViews++;
-          } else if (newSide === 'team') {
-            cardSession.teamViews++;
-          }
-          
-          gtag('event', 'card_flip', {
-            'event_category': 'card_interaction',
-            'event_label': `type_${enneagramType}_to_${newSide}`,
-            'enneagram_type': enneagramType,
-            'side_shown': newSide,
-            'total_flips': cardSession.totalFlips,
-            'session_duration': Math.round((Date.now() - cardSession.startTime) / 1000)
-          });
-          
-          gtag('event', `type_${enneagramType}_flip_to_${newSide}`, {
-            'event_category': 'specific_flips',
-            'enneagram_type': enneagramType,
-            'side_shown': newSide
-          });
-          
-          gtag('event', 'type_viewed', {
-            'event_category': 'card_interaction',
-            'event_label': `type_${enneagramType}`,
-            'custom_parameter_1': enneagramType,
-            'unique_types_in_session': cardSession.typesViewed.size
-          });
-          
-          gtag('event', `type_${enneagramType}_viewed`, {
-            'event_category': 'type_popularity',
-            'enneagram_type': enneagramType,
-            'side_shown': newSide
-          });
-        }
-
-        function trackCardView(card) {
-          const typeMatch = card.className.match(/type-(\d+)/);
-          const enneagramType = typeMatch ? typeMatch[1] : 'experiment';
-          
-          currentlyViewedCards.set(enneagramType, Date.now());
-          
-          if (!viewedCards.has(enneagramType)) {
-            viewedCards.add(enneagramType);
-            
-            gtag('event', 'card_viewed', {
-              'event_category': 'card_exposure',
-              'event_label': `type_${enneagramType}_viewed`,
-              'enneagram_type': enneagramType,
-              'side_shown': 'individual',
-              'view_method': 'scroll'
-            });
-            
-            gtag('event', `type_${enneagramType}_viewed_scroll`, {
-              'event_category': 'card_exposure',
-              'enneagram_type': enneagramType
-            });
-          }
-        }
-
-        function trackCardExit(card) {
-          const typeMatch = card.className.match(/type-(\d+)/);
-          const enneagramType = typeMatch ? typeMatch[1] : 'experiment';
-          
-          if (currentlyViewedCards.has(enneagramType)) {
-            const startTime = currentlyViewedCards.get(enneagramType);
-            const timeSpent = Math.round((Date.now() - startTime) / 1000);
-            
-            if (timeSpent >= 2) {
-              const existingTime = cardEngagementTimes.get(enneagramType) || 0;
-              cardEngagementTimes.set(enneagramType, existingTime + timeSpent);
-              
-              gtag('event', 'card_engagement_time', {
-                'event_category': 'card_engagement',
-                'event_label': `type_${enneagramType}_${timeSpent}s`,
-                'enneagram_type': enneagramType,
-                'engagement_seconds': timeSpent,
-                'total_card_time': cardEngagementTimes.get(enneagramType)
-              });
-              
-              let timeBucket;
-              if (timeSpent < 10) timeBucket = 'quick_scan';
-              else if (timeSpent < 30) timeBucket = 'moderate_read';
-              else if (timeSpent < 60) timeBucket = 'deep_read';
-              else timeBucket = 'extended_study';
-              
-              gtag('event', `type_${enneagramType}_${timeBucket}`, {
-                'event_category': 'engagement_depth',
-                'engagement_seconds': timeSpent,
-                'time_bucket': timeBucket
-              });
+        // Initialize the application when DOM is ready
+        let app;
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            try {
+                app = new EnneagramApp();
+                app.init();
+            } catch (error) {
+                console.error('Failed to start application:', error);
             }
-            
-            currentlyViewedCards.delete(enneagramType);
-          }
-        }
+        });
 
-        function trackSessionSummary() {
-          const sessionDuration = Math.round((cardSession.lastFlipTime - cardSession.startTime) / 1000);
-          const preferredSide = cardSession.individualViews > cardSession.teamViews ? 'individual' : 'team';
-          
-          gtag('event', 'session_summary', {
-            'session_duration': sessionDuration,
-            'total_flips': cardSession.totalFlips,
-            'unique_types': cardSession.typesViewed.size,
-            'preferred_side': preferredSide,
-            'individual_views': cardSession.individualViews,
-            'team_views': cardSession.teamViews
-          });
-        }
-
-        function setupViewTracking() {
-          if ('IntersectionObserver' in window) {
-            viewObserver = new IntersectionObserver((entries) => {
-              entries.forEach(entry => {
-                if (entry.isIntersecting && entry.intersectionRatio > 0.5) {
-                  trackCardView(entry.target);
-                } else if (!entry.isIntersecting && currentlyViewedCards.has(entry.target.className.match(/type-(\d+)/)?.[1] || 'experiment')) {
-                  trackCardExit(entry.target);
-                }
-              });
-            }, {
-              threshold: [0, 0.5]
-            });
-            
-            document.querySelectorAll('.card').forEach(card => {
-              viewObserver.observe(card);
-            });
-          }
-        }
-
-        function resetInactivityTimer() {
-          clearTimeout(inactivityTimer);
-          inactivityTimer = setTimeout(trackSessionSummary, 30000);
-        }
-
-        // Event listeners
+        // Ensure cleanup happens even if page unloads quickly
         window.addEventListener('beforeunload', function() {
-          currentlyViewedCards.forEach((startTime, enneagramType) => {
-            const timeSpent = Math.round((Date.now() - startTime) / 1000);
-            if (timeSpent >= 2) {
-              const existingTime = cardEngagementTimes.get(enneagramType) || 0;
-              cardEngagementTimes.set(enneagramType, existingTime + timeSpent);
-              
-              gtag('event', 'final_card_engagement', {
-                'event_category': 'session_end',
-                'enneagram_type': enneagramType,
-                'engagement_seconds': timeSpent,
-                'total_card_time': cardEngagementTimes.get(enneagramType)
-              });
+            if (app) {
+                app.cleanup();
             }
-          });
-          
-          trackSessionSummary();
         });
-
-        // Click listener - excludes navigation buttons
-        document.addEventListener('click', function(e) {
-          // SKIP navigation buttons entirely
-          if (e.target.closest('.nav-button')) {
-            return;
-          }
-          
-          resetInactivityTimer();
-          
-          // Track card flips only for actual card clicks
-          const card = e.target.closest('.card');
-          if (card) {
-            const typeMatch = card.className.match(/type-(\d+)/);
-            const enneagramType = typeMatch ? typeMatch[1] : 'experiment';
-            
-            setTimeout(() => {
-              const isShowingTeam = card.classList.contains('flipped');
-              const currentSide = isShowingTeam ? 'team' : 'individual';
-              
-              trackCardFlip(enneagramType, currentSide);
-            }, 50);
-          }
-        });
-
-        document.addEventListener('keypress', resetInactivityTimer);
-
-        // Initial page load tracking
-        gtag('event', 'page_load', {
-          'page_title': document.title,
-          'page_location': window.location.href
-        });
-
-        // Initialize view tracking after cards are rendered
-        setTimeout(setupViewTracking, 1000);
-
-       function isElementInViewport(el) {
-  const rect = el.getBoundingClientRect();
-  return (
-    rect.top < window.innerHeight &&
-    rect.bottom > 0
-  );
-}
-function flipBackVisibleCards() {
-  const flippedCards = document.querySelectorAll('.card.flipped');
-  if (flippedCards.length === 0) return;
-
-  flippedCards.forEach(card => {
-    if (isElementInViewport(card)) {
-      card.classList.remove('flipped');
-    }
-  });
-}
-
-let scrollThrottle;
-window.addEventListener('scroll', () => {
-  if (!scrollThrottle) {
-    scrollThrottle = setTimeout(() => {
-      flipBackVisibleCards();
-      scrollThrottle = null;
-    }, 100); // adjust delay to control responsiveness
-  }
-});
-
-function setupScrollFlipReset() {
-  let scrollThrottle;
-  window.addEventListener('scroll', () => {
-    if (!scrollThrottle) {
-      scrollThrottle = setTimeout(() => {
-        flipBackVisibleCards();
-        scrollThrottle = null;
-      }, 100); // Throttle for performance
-    }
-  });
-}
-  window.onload = function () {
-  renderCards();
-  setupViewTracking();
-  setupScrollFlipReset();
-};
-
-// 👇 This runs *after* all DOM + cards are loaded
-window.addEventListener('load', () => {
-  renderCards();
-  setupViewTracking();
-  setupScrollFlipReset();
-});
     </script>
 </body>
 </html>
