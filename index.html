@@ -744,7 +744,9 @@
                     if (flippedCards.length === 0) return;
 
                     flippedCards.forEach(card => {
-                        if (this.isElementInViewport(card)) {
+                        // Only flip back if card is completely out of view (not partially visible)
+                        // This prevents flipping back when user scrolls within a card to read content
+                        if (this.isElementCompletelyOutOfView(card)) {
                             card.classList.remove('flipped');
                         }
                     });
@@ -756,6 +758,19 @@
             isElementInViewport(el) {
                 const rect = el.getBoundingClientRect();
                 return (rect.top < window.innerHeight && rect.bottom > 0);
+            }
+
+            isElementCompletelyOutOfView(el) {
+                const rect = el.getBoundingClientRect();
+                // Card is completely out of view if:
+                // - Top is below the viewport bottom (scrolled past it)
+                // - Bottom is above the viewport top (scrolled before it)
+                // Add buffer zones to prevent premature flipping
+                const buffer = 100; // 100px buffer
+                return (
+                    rect.top > window.innerHeight + buffer || 
+                    rect.bottom < -buffer
+                );
             }
 
             setupPWA() {
