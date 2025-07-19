@@ -618,80 +618,89 @@
                 `;
             }
 
-            createExperimentCard() {
-                return `
-                    <div class="card-container" data-card="experiment">
-                        <div class="card experiment-card" data-type="experiment">
-                            <div class="card-face experiment-card">
-                                <div class="experiment-header">
-                                    <div class="experiment-icon">⚡</div>
-                                    <div class="experiment-title">Weekly Team Experiment</div>
-                                </div>
-                                
-                                <div class="experiment-content">
-                                    <div class="current-experiment">
-                                        <div class="experiment-label">This Week's Focus:</div>
-                                        <div class="experiment-practice">
-                                            Choose a growth edge from someone present and practice it together as a team this week.
-                                        </div>
-                                    </div>
-                                    
-                                    <div class="experiment-instructions">
-                                        <div class="instruction-step">
-                                            <span class="step-number">1.</span>
-                                            <span class="step-text">Pick one person's growth edge from the cards</span>
-                                        </div>
-                                        <div class="instruction-step">
-                                            <span class="step-number">2.</span>
-                                            <span class="step-text">Adapt it for team practice this week</span>
-                                        </div>
-                                        <div class="instruction-step">
-                                            <span class="step-number">3.</span>
-                                            <span class="step-text">Check in Friday: What did we discover?</span>
-                                        </div>
-                                    </div>
-                                </div>
-                                
-                                <div class="flip-indicator">Click to see examples →</div>
-                                
-                                <div class="attribution">
-                                    created by allan @ truedragon.io
-                                </div>
+createExperimentCard() {
+    return `
+        <div class="card-container" data-card="experiment">
+            <div class="card experiment-card" data-type="experiment">
+
+                <!-- Front of the Card -->
+                <div class="card-face experiment-card">
+                    <div class="experiment-header">
+                        <div class="experiment-icon">⚡</div>
+                        <div class="experiment-title">Weekly Team Field Experiment</div>
+                    </div>
+                    
+                    <div class="experiment-content">
+                        <div class="current-experiment">
+                            <div class="experiment-label">This Week’s Invitation:</div>
+                            <div class="experiment-practice">
+                                Choose a growth edge from someone present and turn it into a shared practice. Let that edge shape how the team listens, collaborates, and leads this week.
                             </div>
-                            
-                            <div class="card-face card-back experiment-card">
-                                <div class="experiment-header">
-                                    <div class="experiment-icon">💡</div>
-                                    <div class="experiment-title">Example Team Experiments</div>
-                                </div>
-                                
-                                <div class="experiment-examples">
-                                    <div class="example-card">
-                                        <div class="example-type">Type 7 Growth Edge</div>
-                                        <div class="example-text">"This week: Stay with one difficult conversation until it reaches resolution. Don't pivot or find creative ways around the constraint."</div>
-                                    </div>
-                                    
-                                    <div class="example-card">
-                                        <div class="example-type">Type 3 Growth Edge</div>
-                                        <div class="example-text">"This week: Prioritize authenticity over looking successful. Share what's messy or imperfect instead of waiting until we look polished."</div>
-                                    </div>
-                                    
-                                    <div class="example-card">
-                                        <div class="example-type">Type 8 Growth Edge</div>
-                                        <div class="example-text">"This week: Share uncertainties and ask for help before we feel strong enough. Practice saying 'We don't know' and 'We need support.'"</div>
-                                    </div>
-                                </div>
-                                
-                                <div class="flip-indicator">← Click to flip back</div>
-                                
-                                <div class="attribution">
-                                    created by allan @ truedragon.io
-                                </div>
+                        </div>
+                        
+                        <div class="experiment-instructions">
+                            <div class="instruction-step">
+                                <span class="step-number">1.</span>
+                                <span class="step-text">Pick one person’s growth edge from their card—or surface a shared pattern emerging in the room.</span>
+                            </div>
+                            <div class="instruction-step">
+                                <span class="step-number">2.</span>
+                                <span class="step-text">Adapt it into a simple, visible practice the team can apply all week.</span>
+                            </div>
+                            <div class="instruction-step">
+                                <span class="step-number">3.</span>
+                                <span class="step-text">Check in Friday: What did this edge reveal? What shifted in us?</span>
                             </div>
                         </div>
                     </div>
-                `;
-            }
+                    
+                    <div class="flip-indicator">Click to see example practices →</div>
+
+                    <div class="attribution">
+                        created by allan @ truedragon.io
+                    </div>
+                </div>
+
+                <!-- Back of the Card -->
+                <div class="card-face card-back experiment-card">
+                    <div class="experiment-header">
+                        <div class="experiment-icon">💡</div>
+                        <div class="experiment-title">Example Team Experiments</div>
+                    </div>
+                    
+                    <div class="experiment-examples">
+                        <div class="example-card">
+                            <div class="example-type">Type 7 – Stay With Discomfort</div>
+                            <div class="example-text">
+                                "This week: Stay with one difficult conversation until it’s truly resolved. If you feel the urge to pivot, pause. Stay in the hard part together."
+                            </div>
+                        </div>
+
+                        <div class="example-card">
+                            <div class="example-type">Type 3 – Lead with Realness</div>
+                            <div class="example-text">
+                                "This week: Start one conversation by sharing something that’s still messy or in-process. Let your team see the unfinished you."
+                            </div>
+                        </div>
+
+                        <div class="example-card">
+                            <div class="example-type">Type 8 – Practice Vulnerability</div>
+                            <div class="example-text">
+                                "This week: Say 'I don’t know' at least once. Ask for help where you usually push through alone. Let others meet you in the not-knowing."
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flip-indicator">← Click to flip back</div>
+
+                    <div class="attribution">
+                        created by allan @ truedragon.io
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+}
 
             setupEventListeners() {
                 // Card click handler
