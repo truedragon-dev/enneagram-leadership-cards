@@ -433,8 +433,8 @@
             padding: 20px;
             border-radius: 15px;
             border-left: 4px solid #9f7aea;
-            min-height: 280px;
-            max-height: 320px;
+            min-height: 320px;
+            max-height: 380px;
             overflow-y: auto;
             display: flex;
             align-items: center;
@@ -986,56 +986,56 @@
                 1: {
                     shadow: "Others feel criticized or like they can't get it right",
                     gift: "Integrity and standards that raise the bar for everyone",
-                    experiment: "Act on something 'good enough' before it's perfect",
-                    reflection: "Where did 'good enough' open up momentum or trust?"
+                    experiment: "Ship or share one work item at 80% complete (rather than waiting for 100%)",
+                    reflection: "Where did shipping at 80% actually improve momentum or team trust?"
                 },
                 2: {
                     shadow: "Team feels indebted or guilty rather than connected",
                     gift: "Warmth and presence that make others feel valued",
                     experiment: "Ask directly for one thing you need without offering anything back",
-                    reflection: "What changed when you let others help you?"
+                    reflection: "How did the team respond when you asked directly vs. hinting? What changed when you let others help you?"
                 },
                 3: {
                     shadow: "Others feel like performance matters more than people",
                     gift: "Drive and polish that help the team win",
-                    experiment: "Share something messy, unresolved, or vulnerable",
-                    reflection: "Where did authenticity strengthen your influence?"
+                    experiment: "Share something messy, unresolved, or vulnerable in one meeting",
+                    reflection: "When did showing your messy process make others more willing to be real? Where did authenticity strengthen your influence?"
                 },
                 4: {
                     shadow: "Others feel like they're not deep or special enough",
                     gift: "Vision that creates space for emotional truth and meaning",
-                    experiment: "Share something ordinary or boring about your week",
-                    reflection: "What connection emerged when you shared something plain?"
+                    experiment: "Share one practical challenge you're working on (without making it dramatic or unique)",
+                    reflection: "What connection emerged when you shared something plain and ordinary?"
                 },
                 5: {
                     shadow: "Team feels left out of your thinking process",
                     gift: "Clarity and insight that sharpen the collective mind",
-                    experiment: "Share one idea before it's fully formed",
-                    reflection: "What opened up when you let others in earlier?"
+                    experiment: "Share one work-in-progress idea and ask 'What am I missing?' before researching further",
+                    reflection: "How did early input change the quality of your final decisions? What opened up when you let others in earlier?"
                 },
                 6: {
                     shadow: "Team feels anxious, second-guessed, or hesitant to act",
                     gift: "Risk assessment that builds collective resilience",
-                    experiment: "Take one action without full certainty",
-                    reflection: "What did you learn from acting without guarantees?"
+                    experiment: "Take one action without full certainty this week",
+                    reflection: "What did you discover about your intuition when you acted without guarantees?"
                 },
                 7: {
                     shadow: "Team avoids difficult issues or pivots too quickly",
                     gift: "Innovation and optimism that energize possibility",
-                    experiment: "Stay with one hard conversation until it's fully metabolized",
-                    reflection: "What came from staying in discomfort longer than usual?"
+                    experiment: "When a difficult topic comes up, stay with it for 10+ minutes instead of pivoting to solutions",
+                    reflection: "What depth emerged when you stayed in discomfort longer than usual?"
                 },
                 8: {
                     shadow: "Others feel steamrolled or afraid to speak up",
                     gift: "Boldness that galvanizes action and protects what matters",
-                    experiment: "Admit one uncertainty or ask for help publicly",
-                    reflection: "How did vulnerability strengthen team trust?"
+                    experiment: "In one meeting, say 'I don't know' and ask the team for input instead of deciding alone",
+                    reflection: "How did admitting uncertainty strengthen team trust and decision quality?"
                 },
                 9: {
                     shadow: "Others feel burdened to carry conflict or drive decisions",
                     gift: "Patience and consistency that steady the group",
-                    experiment: "Speak up once when you normally wouldn't",
-                    reflection: "What shifted when your voice entered the room?"
+                    experiment: "Voice one concern or different perspective within 5 minutes of thinking it (instead of staying quiet)",
+                    reflection: "What shifted in team dynamics when your voice entered the room earlier?"
                 }
             };
 
@@ -1065,16 +1065,6 @@
                         <span class="practice-type-number" style="color: ${color};">${typeNum}</span>
                         <span class="practice-type-title">This Week's Focus</span>
                     </div>
-                    
-                    <div class="practice-section">
-                        <div class="practice-label" style="color: #ed8936;">Shadow Signal</div>
-                        <div class="practice-text">${practice.shadow}</div>
-                    </div>
-
-                    <div class="practice-section">
-                        <div class="practice-label" style="color: #38a169;">Gift Signal</div>
-                        <div class="practice-text">${practice.gift}</div>
-                    </div>
 
                     <div class="practice-highlight">
                         <div class="practice-label" style="color: #553c9a;">This Week's Experiment</div>
@@ -1084,6 +1074,22 @@
                     <div class="practice-reflection">
                         <div class="practice-label" style="color: #2c5aa0;">End-of-Week Reflection</div>
                         <div style="font-size: 0.9em; line-height: 1.3; color: #2c5aa0; font-style: italic;">${practice.reflection}</div>
+                    </div>
+
+                    <div style="border-top: 1px solid rgba(0, 0, 0, 0.08); margin: 10px 0; padding-top: 20px;">
+                        <div style="font-size: 0.85em; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: #9ca3af; margin-bottom: 15px; text-align: center;">
+                            Shadow & Gift Patterns
+                        </div>
+                    
+                        <div class="practice-section">
+                            <div class="practice-label" style="color: #ed8936;">Shadow Signal</div>
+                            <div class="practice-text">${practice.shadow}</div>
+                        </div>
+
+                        <div class="practice-section">
+                            <div class="practice-label" style="color: #38a169;">Gift Signal</div>
+                            <div class="practice-text">${practice.gift}</div>
+                        </div>
                     </div>
                 </div>
             `;
