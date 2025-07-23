@@ -362,25 +362,60 @@
         }
 
         .type-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 15px;
-            margin-bottom: 30px;
+            display: flex;
+            overflow-x: auto;
+            gap: 12px;
+            padding: 15px 5px 20px 5px;
+            margin-bottom: 20px;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+
+        .type-grid::-webkit-scrollbar {
+            display: none;
         }
 
         .type-button {
+            flex: 0 0 55px;
+            height: 55px;
             border: none;
-            padding: 15px;
-            border-radius: 10px;
-            font-size: 1.2em;
+            border-radius: 12px;
+            font-size: 1.3em;
             font-weight: bold;
             cursor: pointer;
             color: white;
-            transition: transform 0.2s ease;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
         }
 
         .type-button:hover {
             transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+        }
+
+        .type-button.selected {
+            transform: scale(1.1);
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+            animation: buttonFocus 0.6s ease-out;
+        }
+
+        @keyframes buttonFocus {
+            0% {
+                transform: scale(1);
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+            }
+            50% {
+                transform: scale(1.15);
+                box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+            }
+            100% {
+                transform: scale(1.1);
+                box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+            }
         }
 
         .type-button:nth-child(1) { background: #e76f51; }
@@ -398,11 +433,32 @@
             padding: 20px;
             border-radius: 15px;
             border-left: 4px solid #9f7aea;
-            flex: 1;
-            min-height: 300px;
+            min-height: 280px;
+            max-height: 320px;
+            overflow-y: auto;
             display: flex;
             align-items: center;
             justify-content: center;
+            transition: all 0.4s ease;
+        }
+
+        #weeklyFocus.content-loading {
+            animation: contentFocus 0.6s ease-out;
+        }
+
+        @keyframes contentFocus {
+            0% {
+                transform: scale(1);
+                box-shadow: 0 0 0 0 rgba(159, 122, 234, 0);
+            }
+            50% {
+                transform: scale(1.02);
+                box-shadow: 0 0 0 8px rgba(159, 122, 234, 0.2);
+            }
+            100% {
+                transform: scale(1);
+                box-shadow: 0 0 0 0 rgba(159, 122, 234, 0);
+            }
         }
 
         .practice-content {
@@ -531,15 +587,25 @@
                 scroll-margin-top: 80px;
             }
 
-            .type-grid {
-                grid-template-columns: repeat(2, 1fr);
-                gap: 10px;
+            @media (max-width: 768px) {
+                .type-grid {
+                    gap: 10px;
+                    padding: 15px 5px 15px 5px;
+                }
+
+                .type-button {
+                    flex: 0 0 50px;
+                    height: 50px;
+                    font-size: 1.2em;
+                }
             }
         }
 
         @media (max-width: 480px) {
-            .type-grid {
-                grid-template-columns: 1fr;
+            .type-button {
+                flex: 0 0 45px;
+                height: 45px;
+                font-size: 1.1em;
             }
         }
     </style>
@@ -834,19 +900,19 @@
                             <div class="experiment-instructions">
                                 <div class="instruction-step">
                                     <div class="step-number">1</div>
-                                    <div class="step-text">Someone shares a specific challenge they're working on</div>
+                                    <div class="step-text">Pick one type to focus on this week (try the 9-week sequence)</div>
                                 </div>
                                 <div class="instruction-step">
                                     <div class="step-number">2</div>
-                                    <div class="step-text">Turn it into a simple behavior everyone can practice</div>
+                                    <div class="step-text">Everyone practices that type's growth experiment</div>
                                 </div>
                                 <div class="instruction-step">
                                     <div class="step-number">3</div>
-                                    <div class="step-text">Notice what changes in meetings and interactions</div>
+                                    <div class="step-text">Use that type's Team IQ questions to notice team dynamics in real time</div>
                                 </div>
                                 <div class="instruction-step">
                                     <div class="step-number">4</div>
-                                    <div class="step-text">Share observations at the end of the week</div>
+                                    <div class="step-text">End-of-week debrief: What shifted when we all practiced this Growth Edge?</div>
                                 </div>
                             </div>
 
@@ -892,6 +958,23 @@
 
         // Weekly practice function for the enhanced experiment card
         function showTypeWeek(typeNum) {
+            // Remove selected state from all buttons
+            document.querySelectorAll('.type-button').forEach(btn => {
+                btn.classList.remove('selected');
+            });
+            
+            // Add selected state to clicked button with focus animation
+            event.target.classList.add('selected');
+
+            // Add focus animation to content area
+            const focusDiv = document.getElementById('weeklyFocus');
+            focusDiv.classList.add('content-loading');
+            
+            // Remove animation class after animation completes
+            setTimeout(() => {
+                focusDiv.classList.remove('content-loading');
+            }, 600);
+
             const weeklyPractice = {
                 1: {
                     shadow: "Others feel criticized or like they can't get it right",
@@ -957,7 +1040,6 @@
             const practice = weeklyPractice[typeNum];
             const color = colors[typeNum];
 
-            const focusDiv = document.getElementById('weeklyFocus');
             focusDiv.style.alignItems = 'flex-start';
             focusDiv.style.justifyContent = 'flex-start';
             
@@ -984,7 +1066,7 @@
                     </div>
 
                     <div class="practice-reflection">
-                        <div class="practice-label" style="color: #2c5aa0;">Friday Reflection</div>
+                        <div class="practice-label" style="color: #2c5aa0;">End-of-Week Reflection</div>
                         <div style="font-size: 0.9em; line-height: 1.3; color: #2c5aa0; font-style: italic;">${practice.reflection}</div>
                     </div>
                 </div>
