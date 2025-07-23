@@ -296,6 +296,7 @@
         .shadow-watch { color: #d69e2e; }
         .growth-edge { color: #805ad5; }
 
+        /* Experiment card styles */
         .experiment-card {
             border-left-color: #9f7aea !important;
             background: linear-gradient(135deg, #faf5ff 0%, #f3e8ff 100%) !important;
@@ -317,27 +318,6 @@
             font-size: 1.6em;
             font-weight: 600;
             color: #553c9a;
-        }
-
-        .experiment-content {
-            margin-bottom: 20px;
-        }
-
-        .current-experiment {
-            background: rgba(159, 122, 234, 0.1);
-            padding: 20px;
-            border-radius: 12px;
-            margin-bottom: 25px;
-            border-left: 4px solid #9f7aea;
-        }
-
-        .experiment-label {
-            font-size: 0.9em;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            color: #553c9a;
-            margin-bottom: 10px;
         }
 
         .experiment-practice {
@@ -381,30 +361,107 @@
             color: #4a5568;
         }
 
-        .experiment-examples {
-            display: flex;
-            flex-direction: column;
+        .type-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
             gap: 15px;
+            margin-bottom: 30px;
         }
 
-        .example-card {
-            background: rgba(159, 122, 234, 0.1);
+        .type-button {
+            border: none;
             padding: 15px;
             border-radius: 10px;
+            font-size: 1.2em;
+            font-weight: bold;
+            cursor: pointer;
+            color: white;
+            transition: transform 0.2s ease;
+        }
+
+        .type-button:hover {
+            transform: translateY(-2px);
+        }
+
+        .type-button:nth-child(1) { background: #e76f51; }
+        .type-button:nth-child(2) { background: #4a9b4a; }
+        .type-button:nth-child(3) { background: #2d6a4f; }
+        .type-button:nth-child(4) { background: #4a9b8e; }
+        .type-button:nth-child(5) { background: #1e6091; }
+        .type-button:nth-child(6) { background: #6a4c93; }
+        .type-button:nth-child(7) { background: #457b9d; }
+        .type-button:nth-child(8) { background: #a63446; }
+        .type-button:nth-child(9) { background: #b8956a; }
+
+        #weeklyFocus {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 20px;
+            border-radius: 15px;
             border-left: 4px solid #9f7aea;
+            flex: 1;
+            min-height: 300px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
-        .example-type {
-            font-size: 0.9em;
+        .practice-content {
+            width: 100%;
+        }
+
+        .practice-header-content {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .practice-type-number {
+            font-size: 1.8em;
+            font-weight: bold;
+            margin-right: 8px;
+        }
+
+        .practice-type-title {
+            font-size: 1.1em;
             font-weight: 600;
-            color: #553c9a;
-            margin-bottom: 8px;
+            color: #2d3748;
         }
 
-        .example-text {
+        .practice-section {
+            margin-bottom: 15px;
+        }
+
+        .practice-label {
+            font-weight: 600;
+            font-size: 0.8em;
+            text-transform: uppercase;
+            margin-bottom: 5px;
+        }
+
+        .practice-text {
             font-size: 0.9em;
-            line-height: 1.5;
+            line-height: 1.3;
             color: #2d3748;
+        }
+
+        .practice-highlight {
+            background: rgba(128, 90, 213, 0.1);
+            padding: 12px;
+            border-radius: 8px;
+            border-left: 3px solid #805ad5;
+            margin-bottom: 15px;
+        }
+
+        .practice-reflection {
+            background: rgba(49, 130, 206, 0.1);
+            padding: 12px;
+            border-radius: 8px;
+            border-left: 3px solid #3182ce;
+        }
+
+        .select-prompt {
+            text-align: center;
+            color: #666;
+            font-style: italic;
         }
 
         /* Type-specific colors */
@@ -473,6 +530,17 @@
                 height: 850px;
                 scroll-margin-top: 80px;
             }
+
+            .type-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 10px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .type-grid {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
@@ -527,7 +595,7 @@
                 type: "Type 2—The Considerate Helper",
                 number: "2",
                 coreDrive: "Seeks love and connection by meeting others' needs while avoiding rejection, being seen as inadequate, or feeling unneeded.",
-                leadsThrough: "Motivation, relational inelligence, supportiveness, and resourcefulness",
+                leadsThrough: "Motivation, relational intelligence, supportiveness, and resourcefulness",
                 interactionStyle: "Warm, attentive, relationally attuned. Prioritizes others' needs and rapport. May over-accommodate or avoid direct asks.",
                 shadowWatch: "When I'm in shadow, I can make others feel guilty for having needs I can't meet or for not appreciating my efforts enough. This happens even when I think I'm being selflessly supportive.",
                 growthEdge: "Ask directly for what you need before ensuring others are taken care of, and stay with it long enough to discover that others can stay connected even when you prioritize yourself.",
@@ -748,80 +816,176 @@
             `;
         }
 
-        // Create experiment card HTML
+        // Enhanced experiment card with weekly practice guide
         function createExperimentCard() {
             return `
                 <div class="card-container" data-card="experiment">
                     <div class="card experiment-card" data-type="experiment">
-                        <!-- FRONT -->
                         <div class="card-face experiment-card">
                             <div class="experiment-header">
                                 <div class="experiment-icon">⚡</div>
                                 <div class="experiment-title">Team Growth Experiment</div>
                             </div>
 
-                            <div class="experiment-content">
-                                <div class="experiment-practice">
-                                    Pick one person's growth challenge and make it a team experiment for the week. When everyone practices the same edge together, it creates shared learning and support.
-                                </div>
+                            <div class="experiment-practice">
+                                Pick one person's growth challenge and make it a team experiment for the week. When everyone practices the same edge together, it creates shared learning and support.
+                            </div>
 
-                                <div class="experiment-instructions">
-                                    <div class="instruction-step">
-                                        <div class="step-number">1</div>
-                                        <div class="step-text">Someone shares a specific challenge they're working on</div>
-                                    </div>
-                                    <div class="instruction-step">
-                                        <div class="step-number">2</div>
-                                        <div class="step-text">Turn it into a simple behavior everyone can practice</div>
-                                    </div>
-                                    <div class="instruction-step">
-                                        <div class="step-number">3</div>
-                                        <div class="step-text">Notice what changes in meetings and interactions</div>
-                                    </div>
-                                    <div class="instruction-step">
-                                        <div class="step-number">4</div>
-                                        <div class="step-text">Share observations at the end of the week</div>
-                                    </div>
+                            <div class="experiment-instructions">
+                                <div class="instruction-step">
+                                    <div class="step-number">1</div>
+                                    <div class="step-text">Someone shares a specific challenge they're working on</div>
+                                </div>
+                                <div class="instruction-step">
+                                    <div class="step-number">2</div>
+                                    <div class="step-text">Turn it into a simple behavior everyone can practice</div>
+                                </div>
+                                <div class="instruction-step">
+                                    <div class="step-number">3</div>
+                                    <div class="step-text">Notice what changes in meetings and interactions</div>
+                                </div>
+                                <div class="instruction-step">
+                                    <div class="step-number">4</div>
+                                    <div class="step-text">Share observations at the end of the week</div>
                                 </div>
                             </div>
 
-                            <div class="flip-indicator">Click to see examples →</div>
+                            <div class="flip-indicator">Click to see weekly practice guide →</div>
                             <div class="attribution">designed by allan @ truedragon.io</div>
                         </div>
 
-                        <!-- BACK -->
                         <div class="card-face card-back experiment-card">
                             <div class="experiment-header">
-                                <div class="experiment-icon">💡</div>
-                                <div class="experiment-title">Try One of These</div>
+                                <div class="experiment-icon">📋</div>
+                                <div class="experiment-title">This Week's Focus</div>
                             </div>
 
-                            <div class="experiment-examples">
-                                <div class="example-card">
-                                    <div class="example-type">Type 1:</div>
-                                    <div class="example-text">"I need to act before everything is perfect" → Ship something at 80% complete</div>
-                                </div>
-                                <div class="example-card">
-                                    <div class="example-type">Type 2:</div>
-                                    <div class="example-text">"I need to ask directly for help" → Make one direct request daily</div>
-                                </div>
-                                <div class="example-card">
-                                    <div class="example-type">Type 3:</div>
-                                    <div class="example-text">"I need to show my messy process" → Share work-in-progress once this week</div>
-                                </div>
-                                <div class="example-card">
-                                    <div class="example-type">Type 7:</div>
-                                    <div class="example-text">"I need to limit my options" → Choose three priorities max and say no to everything else</div>
-                                </div>
-                                <div class="example-card">
-                                    <div class="example-type">Type 8:</div>
-                                    <div class="example-text">"I need to ask for help" → Say "I don't know" and ask for input</div>
+                            <div style="text-align: center; margin-bottom: 30px; font-size: 1.1em; color: #553c9a;">
+                                Pick one type to focus on as a team this week
+                            </div>
+
+                            <div class="type-grid">
+                                <button class="type-button" onclick="event.stopPropagation(); showTypeWeek(1)">1</button>
+                                <button class="type-button" onclick="event.stopPropagation(); showTypeWeek(2)">2</button>
+                                <button class="type-button" onclick="event.stopPropagation(); showTypeWeek(3)">3</button>
+                                <button class="type-button" onclick="event.stopPropagation(); showTypeWeek(4)">4</button>
+                                <button class="type-button" onclick="event.stopPropagation(); showTypeWeek(5)">5</button>
+                                <button class="type-button" onclick="event.stopPropagation(); showTypeWeek(6)">6</button>
+                                <button class="type-button" onclick="event.stopPropagation(); showTypeWeek(7)">7</button>
+                                <button class="type-button" onclick="event.stopPropagation(); showTypeWeek(8)">8</button>
+                                <button class="type-button" onclick="event.stopPropagation(); showTypeWeek(9)">9</button>
+                            </div>
+
+                            <div id="weeklyFocus">
+                                <div class="select-prompt">
+                                    Select a type above to see this week's practice
                                 </div>
                             </div>
 
-                            <div class="flip-indicator">← Flip back</div>
+                            <div class="flip-indicator" style="margin-top: 15px;">← Flip back</div>
                             <div class="attribution">designed by allan @ truedragon.io</div>
                         </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Weekly practice function for the enhanced experiment card
+        function showTypeWeek(typeNum) {
+            const weeklyPractice = {
+                1: {
+                    shadow: "Others feel criticized or like they can't get it right",
+                    gift: "Integrity and standards that raise the bar for everyone",
+                    experiment: "Act on something 'good enough' before it's perfect",
+                    reflection: "Where did 'good enough' open up momentum or trust?"
+                },
+                2: {
+                    shadow: "Team feels indebted or guilty rather than connected",
+                    gift: "Warmth and presence that make others feel valued",
+                    experiment: "Ask directly for one thing you need without offering anything back",
+                    reflection: "What changed when you let others help you?"
+                },
+                3: {
+                    shadow: "Others feel like performance matters more than people",
+                    gift: "Drive and polish that help the team win",
+                    experiment: "Share something messy, unresolved, or vulnerable",
+                    reflection: "Where did authenticity strengthen your influence?"
+                },
+                4: {
+                    shadow: "Others feel like they're not deep or special enough",
+                    gift: "Vision that creates space for emotional truth and meaning",
+                    experiment: "Share something ordinary or boring about your week",
+                    reflection: "What connection emerged when you shared something plain?"
+                },
+                5: {
+                    shadow: "Team feels left out of your thinking process",
+                    gift: "Clarity and insight that sharpen the collective mind",
+                    experiment: "Share one idea before it's fully formed",
+                    reflection: "What opened up when you let others in earlier?"
+                },
+                6: {
+                    shadow: "Team feels anxious, second-guessed, or hesitant to act",
+                    gift: "Risk assessment that builds collective resilience",
+                    experiment: "Take one action without full certainty",
+                    reflection: "What did you learn from acting without guarantees?"
+                },
+                7: {
+                    shadow: "Team avoids difficult issues or pivots too quickly",
+                    gift: "Innovation and optimism that energize possibility",
+                    experiment: "Stay with one hard conversation until it's fully metabolized",
+                    reflection: "What came from staying in discomfort longer than usual?"
+                },
+                8: {
+                    shadow: "Others feel steamrolled or afraid to speak up",
+                    gift: "Boldness that galvanizes action and protects what matters",
+                    experiment: "Admit one uncertainty or ask for help publicly",
+                    reflection: "How did vulnerability strengthen team trust?"
+                },
+                9: {
+                    shadow: "Others feel burdened to carry conflict or drive decisions",
+                    gift: "Patience and consistency that steady the group",
+                    experiment: "Speak up once when you normally wouldn't",
+                    reflection: "What shifted when your voice entered the room?"
+                }
+            };
+
+            const colors = {
+                1: '#e76f51', 2: '#4a9b4a', 3: '#2d6a4f', 4: '#4a9b8e', 5: '#1e6091',
+                6: '#6a4c93', 7: '#457b9d', 8: '#a63446', 9: '#b8956a'
+            };
+
+            const practice = weeklyPractice[typeNum];
+            const color = colors[typeNum];
+
+            const focusDiv = document.getElementById('weeklyFocus');
+            focusDiv.style.alignItems = 'flex-start';
+            focusDiv.style.justifyContent = 'flex-start';
+            
+            focusDiv.innerHTML = `
+                <div class="practice-content">
+                    <div class="practice-header-content">
+                        <span class="practice-type-number" style="color: ${color};">${typeNum}</span>
+                        <span class="practice-type-title">This Week's Focus</span>
+                    </div>
+                    
+                    <div class="practice-section">
+                        <div class="practice-label" style="color: #ed8936;">Shadow Signal</div>
+                        <div class="practice-text">${practice.shadow}</div>
+                    </div>
+
+                    <div class="practice-section">
+                        <div class="practice-label" style="color: #38a169;">Gift Signal</div>
+                        <div class="practice-text">${practice.gift}</div>
+                    </div>
+
+                    <div class="practice-highlight">
+                        <div class="practice-label" style="color: #553c9a;">This Week's Experiment</div>
+                        <div style="font-size: 1em; line-height: 1.4; color: #553c9a; font-weight: 500;">${practice.experiment}</div>
+                    </div>
+
+                    <div class="practice-reflection">
+                        <div class="practice-label" style="color: #2c5aa0;">Friday Reflection</div>
+                        <div style="font-size: 0.9em; line-height: 1.3; color: #2c5aa0; font-style: italic;">${practice.reflection}</div>
                     </div>
                 </div>
             `;
