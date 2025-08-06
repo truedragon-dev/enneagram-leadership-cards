@@ -41,9 +41,7 @@
             min-height: 100vh;
             padding: 20px;
             color: #333;
-            -webkit-overflow-scrolling: touch;
-            overscroll-behavior: none;
-            padding-bottom: 60px;
+            padding-bottom: 100px;
         }
 
         .container {
@@ -53,10 +51,10 @@
             border-radius: 20px;
             padding: 40px;
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-            margin-bottom: 40px;
+            margin-bottom: 80px;
         }
 
-        /* Navigation Styles - Fixed for iOS */
+        /* Navigation Styles */
         .navigation {
             position: sticky;
             top: 0;
@@ -158,7 +156,6 @@
             scroll-margin-top: 120px;
         }
 
-        /* iOS-optimized focus animation */
         .card-container.focused {
             animation: cardFocus 0.8s ease-out;
         }
@@ -363,106 +360,18 @@
             color: #4a5568;
         }
 
-        .type-grid {
-            display: flex;
-            overflow-x: auto;
-            gap: 12px;
-            padding: 15px 5px 20px 5px;
-            margin-bottom: 20px;
-            -webkit-overflow-scrolling: touch;
-            scrollbar-width: none;
-            -ms-overflow-style: none;
-        }
-
-        .type-grid::-webkit-scrollbar {
-            display: none;
-        }
-
-        .type-button {
-            flex: 0 0 55px;
-            height: 55px;
-            border: none;
-            border-radius: 12px;
-            font-size: 1.3em;
-            font-weight: bold;
-            cursor: pointer;
-            color: white;
-            transition: all 0.2s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-        }
-
-        .type-button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
-        }
-
-        .type-button.selected {
-            transform: scale(1.1);
-            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
-            animation: buttonFocus 0.6s ease-out;
-        }
-
-        @keyframes buttonFocus {
-            0% {
-                transform: scale(1);
-                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-            }
-            50% {
-                transform: scale(1.15);
-                box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
-            }
-            100% {
-                transform: scale(1.1);
-                box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
-            }
-        }
-
-        .type-button:nth-child(1) { background: #e76f51; }
-        .type-button:nth-child(2) { background: #4a9b4a; }
-        .type-button:nth-child(3) { background: #2d6a4f; }
-        .type-button:nth-child(4) { background: #4a9b8e; }
-        .type-button:nth-child(5) { background: #1e6091; }
-        .type-button:nth-child(6) { background: #6a4c93; }
-        .type-button:nth-child(7) { background: #457b9d; }
-        .type-button:nth-child(8) { background: #a63446; }
-        .type-button:nth-child(9) { background: #b8956a; }
-
         #weeklyFocus {
             background: rgba(255, 255, 255, 0.9);
             padding: 20px;
             border-radius: 15px;
             border-left: 4px solid #9f7aea;
-            min-height: 320px;
-            max-height: 380px;
+            min-height: 280px;
             overflow-y: auto;
             display: flex;
             align-items: center;
             justify-content: center;
             transition: all 0.4s ease;
             -webkit-overflow-scrolling: touch;
-            overscroll-behavior: contain;
-        }
-
-        #weeklyFocus.content-loading {
-            animation: contentFocus 0.6s ease-out;
-        }
-
-        @keyframes contentFocus {
-            0% {
-                transform: scale(1);
-                box-shadow: 0 0 0 0 rgba(159, 122, 234, 0);
-            }
-            50% {
-                transform: scale(1.02);
-                box-shadow: 0 0 0 8px rgba(159, 122, 234, 0.2);
-            }
-            100% {
-                transform: scale(1);
-                box-shadow: 0 0 0 0 rgba(159, 122, 234, 0);
-            }
         }
 
         .practice-content {
@@ -504,11 +413,11 @@
         }
 
         .practice-highlight {
-            background: rgba(128, 90, 213, 0.1);
+            background: rgba(159, 122, 234, 0.1);
             padding: 12px;
             border-radius: 8px;
             border-left: 3px solid #805ad5;
-            margin-bottom: 15px;
+            margin-bottom: 20px;
         }
 
         .practice-reflection {
@@ -516,6 +425,7 @@
             padding: 12px;
             border-radius: 8px;
             border-left: 3px solid #3182ce;
+            margin-bottom: 25px;
         }
 
         .select-prompt {
@@ -590,27 +500,6 @@
                 height: 850px;
                 scroll-margin-top: 80px;
             }
-
-            @media (max-width: 768px) {
-                .type-grid {
-                    gap: 10px;
-                    padding: 15px 5px 15px 5px;
-                }
-
-                .type-button {
-                    flex: 0 0 50px;
-                    height: 50px;
-                    font-size: 1.2em;
-                }
-            }
-        }
-
-        @media (max-width: 480px) {
-            .type-button {
-                flex: 0 0 45px;
-                height: 45px;
-                font-size: 1.1em;
-            }
         }
     </style>
 </head>
@@ -644,7 +533,7 @@
     </div>
 
     <script>
-        // Enneagram Data
+        // Enneagram Data with improved experiments
         const enneagramData = [
             {
                 type: "Type 1—The Strict Perfectionist",
@@ -783,27 +672,21 @@
             }
         ];
 
-        // Navigation Functions (Global scope for onclick handlers)
+        // Navigation Functions
         function scrollToCard(cardNumber) {
             try {
                 const cardElement = document.querySelector(`[data-card="${cardNumber}"]`);
-                if (!cardElement) {
-                    console.error('Card element not found for:', cardNumber);
-                    return;
-                }
+                if (!cardElement) return;
                 
-                // Remove focus from all cards
                 document.querySelectorAll('.card-container').forEach(card => {
                     card.classList.remove('focused');
                 });
                 
-                // Use native scrollIntoView for iOS compatibility
                 cardElement.scrollIntoView({
                     behavior: 'smooth',
                     block: 'start'
                 });
                 
-                // Add focus animation after scroll completes
                 setTimeout(() => {
                     cardElement.classList.add('focused');
                 }, 600);
@@ -812,15 +695,35 @@
             }
         }
 
-        // Card click handler
+        // Card click handler with iOS Safari dropdown fix + reset dropdown
         function handleCardClick(event) {
+            event.stopPropagation();
             const card = event.target.closest('.card');
             if (card) {
+                const wasFlipped = card.classList.contains('flipped');
                 card.classList.toggle('flipped');
+                
+                // iOS Safari fix + reset dropdown when flipping experiment card
+                if (card.dataset.type === 'experiment') {
+                    const dropdown = card.querySelector('#typeSelect');
+                    const focusDiv = document.getElementById('weeklyFocus');
+                    
+                    if (dropdown) {
+                        dropdown.blur();
+                        
+                        // Reset dropdown and content when flipping to front (wasFlipped = true means going to front)
+                        if (wasFlipped) {
+                            dropdown.value = "";
+                            focusDiv.style.alignItems = 'center';
+                            focusDiv.style.justifyContent = 'center';
+                            focusDiv.innerHTML = '<div class="select-prompt">Select a type above to see this week\'s practice</div>';
+                        }
+                    }
+                }
             }
         }
 
-        // Create card HTML
+        // Create regular type card
         function createCard(data) {
             return `
                 <div class="card-container" data-card="${data.number}">
@@ -886,7 +789,7 @@
             `;
         }
 
-        // Enhanced experiment card with weekly practice guide
+        // Create experiment card with dropdown and weekly practices
         function createExperimentCard() {
             return `
                 <div class="card-container" data-card="experiment">
@@ -975,15 +878,16 @@
             `;
         }
 
-        // Weekly practice function for the enhanced experiment card
+        // Weekly practice function with improved experiments
         function showTypeWeek(typeNum) {
-            // Don't proceed if no type selected
             if (!typeNum) return;
             
-            // Stop any event propagation
-            if (event) {
-                event.stopPropagation();
-                event.preventDefault();
+            try {
+                if (event) {
+                    event.stopPropagation();
+                }
+            } catch (e) {
+                // Ignore if event doesn't exist
             }
 
             const weeklyPractice = {
@@ -1051,15 +955,7 @@
             const practice = weeklyPractice[typeNum];
             const color = colors[typeNum];
 
-            // Add focus animation to content area
             const focusDiv = document.getElementById('weeklyFocus');
-            focusDiv.classList.add('content-loading');
-            
-            // Remove animation class after animation completes
-            setTimeout(() => {
-                focusDiv.classList.remove('content-loading');
-            }, 600);
-
             focusDiv.style.alignItems = 'flex-start';
             focusDiv.style.justifyContent = 'flex-start';
             
@@ -1099,21 +995,25 @@
             `;
         }
 
-        // Scroll handler for flipping back cards
+        // Scroll handler for auto-flipping cards back when out of view
         function handleScroll() {
-            const flippedCards = document.querySelectorAll('.card.flipped');
-            
-            flippedCards.forEach(card => {
-                if (isElementCompletelyOutOfView(card)) {
-                    card.classList.remove('flipped');
-                }
-            });
+            try {
+                const flippedCards = document.querySelectorAll('.card.flipped');
+                
+                flippedCards.forEach(card => {
+                    if (isElementCompletelyOutOfView(card)) {
+                        card.classList.remove('flipped');
+                    }
+                });
+            } catch (error) {
+                console.warn('Scroll handler error:', error);
+            }
         }
 
         // Check if element is completely out of viewport
         function isElementCompletelyOutOfView(el) {
             const rect = el.getBoundingClientRect();
-            const buffer = 100; // 100px buffer to prevent premature flipping
+            const buffer = 100;
             return (
                 rect.top > window.innerHeight + buffer || 
                 rect.bottom < -buffer
@@ -1139,20 +1039,15 @@
                     throw new Error('Card grid element not found');
                 }
                 
-                // Generate all cards
                 const typeCards = enneagramData.map(data => createCard(data)).join('');
                 const experimentCard = createExperimentCard();
                 
-                // Insert cards into grid
                 grid.innerHTML = typeCards + experimentCard;
                 
-                // Add click event listener for card flipping
                 grid.addEventListener('click', handleCardClick);
-                
-                // Add scroll event listener for auto flip-back
                 window.addEventListener('scroll', throttledScrollHandler, { passive: true });
                 
-                console.log('Enneagram app initialized successfully');
+                console.log('Enneagram app with iOS fix initialized successfully');
             } catch (error) {
                 console.error('Failed to initialize app:', error);
                 showErrorMessage();
